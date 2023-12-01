@@ -1,0 +1,6 @@
+Server=localhost
+Database=MyTunes
+User=
+Password=
+Port=1433
+UseIntegratedSecurity=true
