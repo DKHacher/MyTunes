@@ -3,6 +3,8 @@ package Folder.Gui.util;
 import Folder.Be.Song;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -13,6 +15,7 @@ public class PlaybackHandler {
     private boolean isMuted;
 
     private DoubleProperty volume = new SimpleDoubleProperty(50.0);
+    private StringProperty currentPlayingSong = new SimpleStringProperty("(None) is playing");
     private Double savedVolume = 50.0;
 
     public PlaybackHandler() {
@@ -27,10 +30,12 @@ public class PlaybackHandler {
             currentPlayer.play();
             isPlaying = true;
             setVolume(volume.get());
+            currentPlayingSong.set(song.getTitle() + " by " + song.getArtist() + " is playing");
         } else {
             if (currentPlayer != null) {
                 currentPlayer.stop();
                 isPlaying = false;
+                currentPlayingSong.set("(None) is playing");
             }
 
             Media media = new Media(song.getFile().toURI().toString());
@@ -39,6 +44,7 @@ public class PlaybackHandler {
             currentPlayer.play();
             isPlaying = true;
             setVolume(volume.get());
+            currentPlayingSong.set(song.getTitle() + " by " + song.getArtist() + " is playing");
         }
     }
 
@@ -46,6 +52,7 @@ public class PlaybackHandler {
         if (currentPlayer != null) {
             currentPlayer.pause();
             isPlaying = false;
+            currentPlayingSong.set("(None) is playing");
         }
     }
 
@@ -90,5 +97,9 @@ public class PlaybackHandler {
             setVolume(savedVolume);
             isMuted = false;
         }
+    }
+
+    public StringProperty getCurrentPlayingSong() {
+        return currentPlayingSong;
     }
 }

@@ -37,10 +37,7 @@ public class MainController {
     @FXML private Button btnPlay;
     @FXML private ImageView playPauseImageView;
     @FXML private Slider volumeSlider;
-
-
-    private Image playIcon;
-    private Image pauseIcon;
+    @FXML private Label currentPlayingLbl;
 
     private final SongDialogModel songDialogModel;
     private final PlaybackHandler playbackHandler;
@@ -68,6 +65,7 @@ public class MainController {
         tblSongs.setItems(songModel.getObservableSongs());
 
         volumeSlider.valueProperty().bindBidirectional(playbackHandler.volumeProperty());
+        currentPlayingLbl.textProperty().bind(playbackHandler.getCurrentPlayingSong());
     }
 
     @FXML
