@@ -6,7 +6,6 @@ import Folder.Gui.model.SongModel;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.SongDialogViewBuilder;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -37,6 +36,7 @@ public class MainController {
     @FXML private TextField searchField;
     @FXML private Button btnPlay;
     @FXML private ImageView playPauseImageView;
+    @FXML private Slider volumeSlider;
 
 
     private Image playIcon;
@@ -66,6 +66,8 @@ public class MainController {
         colDuration.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(new TimeStringConverter().toString(cellData.getValue().getDuration())));
 
         tblSongs.setItems(songModel.getObservableSongs());
+
+        volumeSlider.valueProperty().bindBidirectional(playbackHandler.volumeProperty());
     }
 
     @FXML
