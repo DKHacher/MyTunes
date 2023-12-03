@@ -6,8 +6,10 @@ import Folder.Gui.model.SongModel;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.SongDialogViewBuilder;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -134,6 +136,24 @@ public class MainController {
         } else if (playbackHandler.isPlaying()) {
             togglePlayPauseIcon(false);
             playbackHandler.pause();
+        }
+    }
+
+    @FXML
+    private void nextSong(ActionEvent event) {
+        if (playbackHandler.isPlaying()) {
+            Song curSong = playbackHandler.getCurrentSong();
+            if (curSong != null) {
+                ObservableList<Song> playbackSongs = songModel.getPlaybackSongs();
+                int curIndex = playbackSongs.indexOf(curSong);
+
+                if (curIndex >= 0) {
+                    int nextIndex = curIndex + 1;
+                    if (nextIndex < playbackSongs.size()) {
+                        playbackHandler.play(playbackSongs.get(nextIndex));
+                    }
+                }
+            }
         }
     }
 

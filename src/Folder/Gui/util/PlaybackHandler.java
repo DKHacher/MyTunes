@@ -41,4 +41,8 @@ public class PlaybackHandler {
     public boolean isPlaying() {
         return isPlaying;
     }
+
+    public Song getCurrentSong() {
+        return currentSong;
+    }
 }

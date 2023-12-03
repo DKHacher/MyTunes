@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public class SongModel {
     private ObservableList<Song> songsToBeViewed;
+    private ObservableList<Song> playbackSongs;
     private ObservableList<String> genres;
     private DataProcessor dataProcessor;
 
@@ -20,6 +21,9 @@ public class SongModel {
 
         genres = FXCollections.observableArrayList();
         genres.addAll(dataProcessor.getAllGenres());
+
+        playbackSongs = FXCollections.observableArrayList();
+        playbackSongs.addAll(songsToBeViewed);
     }
 
     public ObservableList<Song> getObservableSongs() {
@@ -28,6 +32,10 @@ public class SongModel {
 
     public ObservableList<String> getObservableGenres() {
         return genres;
+    }
+
+    public ObservableList<Song> getPlaybackSongs() {
+        return playbackSongs;
     }
 
     public void updateGenres() throws Exception {
