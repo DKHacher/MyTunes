@@ -1,5 +1,7 @@
 package Folder.Be;
 
+import java.io.File;
+
 public class Song {
     private int id;
     private String title;
@@ -59,6 +61,10 @@ public class Song {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public File getFile() {
+        return new File(filePath);
     }
 
     @Override

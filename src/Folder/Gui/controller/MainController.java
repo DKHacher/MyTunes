@@ -3,6 +3,7 @@ package Folder.Gui.controller;
 import Folder.Be.Song;
 import Folder.Gui.model.SongDialogModel;
 import Folder.Gui.model.SongModel;
+import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.SongDialogViewBuilder;
 import javafx.beans.binding.Bindings;
@@ -32,12 +33,14 @@ public class MainController {
     @FXML private TextField searchField;
 
 
-    SongDialogModel songDialogModel;
+    private final SongDialogModel songDialogModel;
+    private final PlaybackHandler playbackHandler;
     private SongModel songModel;
 
 
     public MainController() {
         songDialogModel = new SongDialogModel();
+        playbackHandler = new PlaybackHandler();
 
         try {
             songModel = new SongModel();
@@ -112,6 +115,15 @@ public class MainController {
             songModel.filterSongs(searchText);
         } catch (Exception e) {
             displayError(e);
+        }
+    }
+
+    @FXML
+    private void playSong(ActionEvent event) {
+        Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+
+        if (selectedSong != null) {
+            playbackHandler.play(selectedSong);
         }
     }
 
