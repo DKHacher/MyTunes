@@ -13,6 +13,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.media.Media;
@@ -31,7 +33,12 @@ public class MainController {
     @FXML private TableColumn<Song, String> colDuration;
 
     @FXML private TextField searchField;
+    @FXML private Button btnPlay;
+    @FXML private ImageView playPauseImageView;
 
+
+    private Image playIcon;
+    private Image pauseIcon;
 
     private final SongDialogModel songDialogModel;
     private final PlaybackHandler playbackHandler;
@@ -57,7 +64,6 @@ public class MainController {
         colDuration.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(new TimeStringConverter().toString(cellData.getValue().getDuration())));
 
         tblSongs.setItems(songModel.getObservableSongs());
-
     }
 
     @FXML
@@ -122,8 +128,20 @@ public class MainController {
     private void playSong(ActionEvent event) {
         Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
 
-        if (selectedSong != null) {
+        if (!playbackHandler.isPlaying() && selectedSong != null) {
+            togglePlayPauseIcon(true);
             playbackHandler.play(selectedSong);
+        } else if (playbackHandler.isPlaying()) {
+            togglePlayPauseIcon(false);
+            playbackHandler.pause();
+        }
+    }
+
+    private void togglePlayPauseIcon(boolean isPlaying) {
+        if (isPlaying) {
+            playPauseImageView.setImage(new Image("/Images/pause.png"));
+        } else {
+            playPauseImageView.setImage(new Image("/Images/one-right.png"));
         }
     }
 

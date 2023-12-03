@@ -125,7 +125,8 @@ public class SongDAO_DB implements ISongDataAccess {
             // Run the specified SQL statement
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new Exception("Could not delete movie", e);
+            e.printStackTrace();
+            throw new Exception("Could not delete song", e);
         }
     }
 

@@ -30,14 +30,15 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="btnPlay" layoutX="66.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" onAction="#playSong">
+      <Button fx:id="btnPlay" layoutX="66.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" prefWidth="40.0" prefHeight="40.0" onAction="#playSong">
          <graphic>
-            <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="playPauseImageView" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@Images/one-right.png" />
                </image>
             </ImageView>
-         </graphic></Button>
+         </graphic>
+      </Button>
       <Button layoutX="118.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
