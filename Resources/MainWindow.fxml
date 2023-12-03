@@ -101,10 +101,14 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <ImageView fitHeight="18.0" fitWidth="36.0" layoutX="17.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@Images/Volume.png" />
-         </image>
-      </ImageView>
+      <Button fx:id="btnMute" layoutX="17.0" layoutY="54.0" onAction="#muteVolume">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@Images/Volume.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

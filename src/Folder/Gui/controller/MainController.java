@@ -177,6 +177,15 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void muteVolume(ActionEvent event) {
+        if (playbackHandler.isMuted()) {
+            playbackHandler.unmute();
+        } else {
+            playbackHandler.mute();
+        }
+    }
+
     private void togglePlayPauseIcon(boolean isPlaying) {
         if (isPlaying) {
             playPauseImageView.setImage(new Image("/Images/pause.png"));

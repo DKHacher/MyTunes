@@ -10,11 +10,14 @@ public class PlaybackHandler {
     private MediaPlayer currentPlayer;
     private Song currentSong;
     private boolean isPlaying;
+    private boolean isMuted;
 
     private DoubleProperty volume = new SimpleDoubleProperty(50.0);
+    private Double savedVolume = 50.0;
 
     public PlaybackHandler() {
         isPlaying = false;
+        isMuted = false;
 
         volume.addListener((obs, ov, nv) -> setVolume(nv.doubleValue()));
     }
@@ -50,6 +53,10 @@ public class PlaybackHandler {
         return isPlaying;
     }
 
+    public boolean isMuted() {
+        return isMuted;
+    }
+
     public Song getCurrentSong() {
         return currentSong;
     }
@@ -66,6 +73,22 @@ public class PlaybackHandler {
         this.volume.set(volume);
         if (currentPlayer != null) {
             currentPlayer.setVolume(volume / 100.0);
+            isMuted = volume == 0.0;
+        }
+    }
+
+    public void mute() {
+        if (!isMuted) {
+            savedVolume = volume.get();
+            setVolume(0.0);
+            isMuted = true;
+        }
+    }
+
+    public void unmute() {
+        if (isMuted) {
+            setVolume(savedVolume);
+            isMuted = false;
         }
     }
 }
