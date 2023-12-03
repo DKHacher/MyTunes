@@ -53,4 +53,9 @@ public class SongModel {
             song.setFilePath(updatedSong.getFilePath());
         }
     }
+
+    public void deleteSong(Song song) throws Exception {
+        dataProcessor.deleteSong(song);
+        songsToBeViewed.remove(song);
+    }
 }

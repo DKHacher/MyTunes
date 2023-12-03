@@ -9,4 +9,5 @@ public interface ISongDataAccess {
     List<String> getAllGenres() throws Exception;
     Song createSong(Song song) throws Exception;
     public void updateSong(Song song) throws Exception;
+    public void deleteSong(Song song) throws Exception;
 }

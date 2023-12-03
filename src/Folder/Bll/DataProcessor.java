@@ -29,4 +29,8 @@ public class DataProcessor {
     public void updateSong(Song song) throws Exception {
         musicDAO.updateSong(song);
     }
+
+    public void deleteSong(Song song) throws Exception {
+        musicDAO.deleteSong(song);
+    }
 }

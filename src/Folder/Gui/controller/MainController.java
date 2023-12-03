@@ -19,6 +19,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.util.Optional;
 
 public class MainController {
     @FXML private TableView tblSongs;
@@ -26,9 +27,6 @@ public class MainController {
     @FXML private TableColumn<Song, String> colArtist;
     @FXML private TableColumn<Song, String> colGenre;
     @FXML private TableColumn<Song, String> colDuration;
-
-    @FXML private Button btnNew;
-    @FXML private Button btnEdit;
 
     SongDialogModel songDialogModel;
     private SongModel songModel;
@@ -77,6 +75,28 @@ public class MainController {
             } catch (Exception e) {
                 displayError(e);
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    private void deleteSong(ActionEvent event) {
+        Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+
+        if (selectedSong != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Deletion");
+            alert.setHeaderText("Delete Song");
+            alert.setContentText("Are you sure you want to delete the song: " + selectedSong.getTitle() + " by " + selectedSong.getArtist() + "?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    songModel.deleteSong(selectedSong);
+                } catch (Exception e) {
+                    displayError(e);
+                }
             }
         }
     }

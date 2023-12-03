@@ -111,4 +111,21 @@ public class SongDAO_DB implements ISongDataAccess {
             throw new Exception("Could not update song", e);
         }
     }
+
+    @Override
+    public void deleteSong(Song song) throws Exception {
+        // SQL command
+        String sql = "DELETE FROM dbo.Song WHERE ID = ?;";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setInt(1, song.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Could not delete movie", e);
+        }
+    }
 }
