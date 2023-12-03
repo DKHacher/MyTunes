@@ -8,4 +8,5 @@ public interface ISongDataAccess {
     List<Song> getAllSongs() throws Exception;
     List<String> getAllGenres() throws Exception;
     Song createSong(Song song) throws Exception;
+    public void updateSong(Song song) throws Exception;
 }

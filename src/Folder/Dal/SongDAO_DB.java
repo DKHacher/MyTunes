@@ -47,7 +47,7 @@ public class SongDAO_DB implements ISongDataAccess {
 
         try (Connection conn = dbConnector.getConnection();
              Statement stmt = conn.createStatement()) {
-            String sql = "SELECT DISTINCT Genre FROM dbo.Song;";
+            String sql = "SELECT DISTINCT Genre FROM dbo.Song ORDER BY Genre ASC;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -86,6 +86,29 @@ public class SongDAO_DB implements ISongDataAccess {
             return new Song(id, song.getTitle(), song.getArtist(), song.getGenre(), song.getDuration(), song.getFilePath());
         } catch (SQLException e) {
             throw new Exception("Could not add song to DB", e);
+        }
+    }
+
+    @Override
+    public void updateSong(Song song) throws Exception {
+        // SQL command
+        String sql = "UPDATE dbo.Song SET Title = ?, Artist = ?, Genre = ?, Duration = ?, FilePath = ? WHERE ID = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setString(1, song.getTitle());
+            stmt.setString(2, song.getArtist());
+            stmt.setString(3, song.getGenre());
+            stmt.setInt(4, song.getDuration());  // Assuming duration is stored as an integer (milliseconds)
+            stmt.setString(5, song.getFilePath());
+            stmt.setInt(6, song.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new Exception("Could not update song", e);
         }
     }
 }
