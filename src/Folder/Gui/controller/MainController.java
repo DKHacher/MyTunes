@@ -157,6 +157,24 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void prevSong(ActionEvent event) {
+        if (playbackHandler.isPlaying()) {
+            Song curSong = playbackHandler.getCurrentSong();
+            if (curSong != null) {
+                ObservableList<Song> playbackSongs = songModel.getPlaybackSongs();
+                int curIndex = playbackSongs.indexOf(curSong);
+
+                if (curIndex >= 0) {
+                    int prevIndex = curIndex - 1;
+                    if (prevIndex >= 0) {
+                        playbackHandler.play(playbackSongs.get(prevIndex));
+                    }
+                }
+            }
+        }
+    }
+
     private void togglePlayPauseIcon(boolean isPlaying) {
         if (isPlaying) {
             playPauseImageView.setImage(new Image("/Images/pause.png"));

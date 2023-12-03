@@ -22,7 +22,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;">
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" onAction="#prevSong">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
