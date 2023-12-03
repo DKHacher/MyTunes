@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -27,6 +28,9 @@ public class MainController {
     @FXML private TableColumn<Song, String> colArtist;
     @FXML private TableColumn<Song, String> colGenre;
     @FXML private TableColumn<Song, String> colDuration;
+
+    @FXML private TextField searchField;
+
 
     SongDialogModel songDialogModel;
     private SongModel songModel;
@@ -98,6 +102,16 @@ public class MainController {
                     displayError(e);
                 }
             }
+        }
+    }
+
+    @FXML
+    private void handleSearch(KeyEvent event) {
+        String searchText = searchField.getText();
+        try {
+            songModel.filterSongs(searchText);
+        } catch (Exception e) {
+            displayError(e);
         }
     }
 

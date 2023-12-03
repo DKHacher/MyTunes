@@ -128,4 +128,36 @@ public class SongDAO_DB implements ISongDataAccess {
             throw new Exception("Could not delete movie", e);
         }
     }
+
+    @Override
+    public List<Song> filterSongs(String searchText) throws Exception {
+        List<Song> allSongs = new ArrayList<>();
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Song WHERE Title LIKE ? OR Artist LIKE ?")) {
+
+            // Set parameters for the PreparedStatement
+            String searchParam = "%" + searchText + "%";
+            stmt.setString(1, searchParam);
+            stmt.setString(2, searchParam);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String title = rs.getString("Title");
+                String artist = rs.getString("Artist");
+                String genre = rs.getString("Genre");
+                int duration = rs.getInt("Duration");
+                String filePath = rs.getString("FilePath");
+
+                Song song = new Song(id, title, artist, genre, duration, filePath);
+                allSongs.add(song);
+            }
+
+            return allSongs;
+        } catch (SQLException e) {
+            throw new Exception("Error filtering songs", e);
+        }
+    }
 }

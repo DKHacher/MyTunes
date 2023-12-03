@@ -5,6 +5,7 @@ import Folder.Bll.DataProcessor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SongModel {
@@ -57,5 +58,11 @@ public class SongModel {
     public void deleteSong(Song song) throws Exception {
         dataProcessor.deleteSong(song);
         songsToBeViewed.remove(song);
+    }
+
+    public void filterSongs(String searchTexT) throws Exception {
+        List<Song> filteredSongs = dataProcessor.filterSongs(searchTexT);
+        songsToBeViewed.clear();
+        songsToBeViewed.addAll(filteredSongs);
     }
 }

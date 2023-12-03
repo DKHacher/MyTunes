@@ -10,4 +10,5 @@ public interface ISongDataAccess {
     Song createSong(Song song) throws Exception;
     public void updateSong(Song song) throws Exception;
     public void deleteSong(Song song) throws Exception;
+    public List<Song> filterSongs(String searchText) throws Exception;
 }

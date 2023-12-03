@@ -13,7 +13,7 @@
 
 <AnchorPane prefHeight="591.0" prefWidth="873.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Folder.Gui.controller.MainController">
    <children>
-      <TextField layoutX="649.0" layoutY="14.0" />
+      <TextField fx:id="searchField" layoutX="649.0" layoutY="14.0" onKeyPressed="#handleSearch" />
       <Button layoutX="807.0" layoutY="14.0" mnemonicParsing="false">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

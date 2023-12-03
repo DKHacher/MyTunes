@@ -51,4 +51,9 @@ public class SongDAO_Mock implements ISongDataAccess {
     public void deleteSong(Song song) throws Exception {
         return;
     }
+
+    @Override
+    public List<Song> filterSongs(String searchText) throws Exception {
+        return null;
+    }
 }

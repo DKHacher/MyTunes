@@ -33,4 +33,8 @@ public class DataProcessor {
     public void deleteSong(Song song) throws Exception {
         musicDAO.deleteSong(song);
     }
+
+    public List<Song> filterSongs(String searchText) throws Exception {
+        return musicDAO.filterSongs(searchText);
+    }
 }
