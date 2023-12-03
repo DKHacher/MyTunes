@@ -3,13 +3,11 @@ package Folder.Gui.model;
 import Folder.Be.Song;
 import Folder.Gui.util.TimeStringConverter;
 import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 
 public class SongDialogModel {
+    private final IntegerProperty id = new SimpleIntegerProperty(-1);
     private final StringProperty title = new SimpleStringProperty("");
     private final StringProperty artist = new SimpleStringProperty("");
     private final StringProperty genre = new SimpleStringProperty("");
@@ -23,6 +21,7 @@ public class SongDialogModel {
 
     public void setProperties(Song song) {
         if (song != null) {
+            setId(song.getId());
             setTitle(song.getTitle());
             setArtist(song.getArtist());
             setGenre(song.getGenre());
@@ -33,6 +32,7 @@ public class SongDialogModel {
 
     public Observable[] getBindableProperties() {
         return new Observable[] {
+                idProperty(),
                 titleProperty(),
                 artistProperty(),
                 genreProperty(),
@@ -42,11 +42,24 @@ public class SongDialogModel {
     }
 
     public void reset() {
+        setId(-1);
         setTitle("");
         setArtist("");
         setGenre("");
         setDuration(0);
         setFilePath("");
+    }
+
+    public int getId() {
+        return id.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
     }
 
     public String getTitle() {

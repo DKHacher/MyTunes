@@ -5,6 +5,8 @@ import Folder.Bll.DataProcessor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Optional;
+
 public class SongModel {
     private ObservableList<Song> songsToBeViewed;
     private ObservableList<String> genres;
@@ -35,5 +37,20 @@ public class SongModel {
     public void createNewSong(Song song) throws Exception {
         Song s = dataProcessor.createNewSong(song);
         songsToBeViewed.add(s);
+    }
+
+    public void updateSong(Song updatedSong) throws Exception {
+        dataProcessor.updateSong(updatedSong);
+
+        Optional<Song> matchingSong = songsToBeViewed.stream().filter(s -> s.getId() == updatedSong.getId()).findFirst();
+        if (matchingSong.isPresent()) {
+            Song song = matchingSong.get();
+
+            song.setTitle(updatedSong.getTitle());
+            song.setArtist(updatedSong.getArtist());
+            song.setGenre(updatedSong.getGenre());
+            song.setDuration(updatedSong.getDuration());
+            song.setFilePath(updatedSong.getFilePath());
+        }
     }
 }

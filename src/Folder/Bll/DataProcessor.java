@@ -25,4 +25,8 @@ public class DataProcessor {
     public Song createNewSong(Song newSong) throws Exception {
         return musicDAO.createSong(newSong);
     }
+
+    public void updateSong(Song song) throws Exception {
+        musicDAO.updateSong(song);
+    }
 }

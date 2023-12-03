@@ -104,7 +104,11 @@ public class MainController {
         // Handle pressing the dialog buttons
         dialog.setResultConverter(dialogBtn -> {
             if (dialogBtn == ButtonType.OK) {
-                return createNewSongFromModel(songDialogModel);
+                if (mode == SongDialogViewBuilder.Mode.CREATE) {
+                    return createNewSongFromModel(songDialogModel);
+                } else {
+                    return updateSongFromModel(songDialogModel);
+                }
             }
             return null;
         });
@@ -167,6 +171,26 @@ public class MainController {
             songModel.createNewSong(newSong);
             model.reset();
             return newSong;
+        } catch (Exception e) {
+            displayError(e);
+            return null;
+        }
+    }
+
+    private Song updateSongFromModel(SongDialogModel model) {
+        try {
+            int id = model.getId();
+            String title = model.getTitle();
+            String artist = model.getArtist();
+            String genre = model.getGenre();
+            int duration = new TimeStringConverter().fromString(model.getDuration());
+            String filePath = model.getFilePath();
+
+            Song song = new Song(id, title, artist, genre, duration, filePath);
+            songModel.updateSong(song);
+            model.reset();
+            tblSongs.refresh();
+            return song;
         } catch (Exception e) {
             displayError(e);
             return null;
