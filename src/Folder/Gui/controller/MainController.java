@@ -38,6 +38,9 @@ public class MainController {
     @FXML private ImageView playPauseImageView;
     @FXML private Slider volumeSlider;
     @FXML private Label currentPlayingLbl;
+    @FXML private Slider playbackSlider;
+    @FXML private Label curTimeLbl;
+    @FXML private Label totalDurLbl;
 
     private final SongDialogModel songDialogModel;
     private final PlaybackHandler playbackHandler;
@@ -65,7 +68,29 @@ public class MainController {
         tblSongs.setItems(songModel.getObservableSongs());
 
         volumeSlider.valueProperty().bindBidirectional(playbackHandler.volumeProperty());
-        currentPlayingLbl.textProperty().bind(playbackHandler.getCurrentPlayingSong());
+        currentPlayingLbl.textProperty().bind(playbackHandler.currentPlayingSongProperty());
+
+
+        playbackSlider.valueProperty().bindBidirectional(playbackHandler.currentSongPositionProperty());
+
+        playbackSlider.setOnMousePressed(evt -> playbackHandler.pause());
+        playbackSlider.setOnMouseReleased(evt -> {
+            double newPos = playbackSlider.getValue();
+            double totalDur = playbackHandler.getTotalDuration();
+            playbackHandler.seek((newPos / 100.0) * totalDur);
+        });
+
+        curTimeLbl.textProperty().bind(Bindings.createStringBinding(() -> {
+            double curTime = playbackHandler.getCurrentTime();
+            return new TimeStringConverter().toString((int) (curTime * 1000));
+        }, playbackHandler.currentTimeProperty().asObject()));
+
+        totalDurLbl.textProperty().bind(Bindings.createStringBinding(() -> {
+            double totalDur = playbackHandler.getTotalDuration();
+            return new TimeStringConverter().toString((int) (totalDur * 1000));
+        }, playbackHandler.totalDurationProperty().asObject()));
+
+
     }
 
     @FXML

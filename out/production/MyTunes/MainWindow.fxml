@@ -22,7 +22,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" onAction="#prevSong">
+      <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#prevSong" style="-fx-background-radius: 100;">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -30,7 +30,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="btnPlay" layoutX="66.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" prefWidth="40.0" prefHeight="40.0" onAction="#playSong">
+      <Button fx:id="btnPlay" layoutX="66.0" layoutY="14.0" mnemonicParsing="false" onAction="#playSong" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100;">
          <graphic>
             <ImageView fx:id="playPauseImageView" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -39,7 +39,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="118.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-radius: 100;" onAction="#nextSong">
+      <Button layoutX="118.0" layoutY="14.0" mnemonicParsing="false" onAction="#nextSong" style="-fx-background-radius: 100;">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -110,5 +110,8 @@
             </ImageView>
          </graphic>
       </Button>
+      <Slider fx:id="playbackSlider" layoutX="253.0" layoutY="56.0" prefHeight="14.0" prefWidth="354.0" />
+      <Label fx:id="curTimeLbl" layoutX="216.0" layoutY="55.0" text="00:00" />
+      <Label fx:id="totalDurLbl" layoutX="610.0" layoutY="55.0" text="00:00" />
    </children>
 </AnchorPane>
