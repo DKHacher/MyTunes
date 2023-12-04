@@ -7,10 +7,10 @@ import Folder.Dal.SongDAO_DB;
 import java.io.IOException;
 import java.util.List;
 
-public class DataProcessor {
+public class SongProcessor {
     private ISongDataAccess musicDAO;
 
-    public DataProcessor() throws IOException {
+    public SongProcessor() throws IOException {
         musicDAO = new SongDAO_DB();
     }
 

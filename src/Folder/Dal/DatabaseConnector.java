@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class DatabaseConnector {
     //Class will easv.mrs.be included when we start working on DATABASES
-    private static final String PROP_FILE = "Config/Config.Local.Settings.txt";
+    private static final String PROP_FILE = "Config/Config.Settings.txt";
 
     private SQLServerDataSource dataSource;
 

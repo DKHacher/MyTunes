@@ -1,22 +1,22 @@
 package Folder.Gui.model;
 
 import Folder.Be.Song;
-import Folder.Bll.DataProcessor;
+import Folder.Bll.SongProcessor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class SongModel {
     private ObservableList<Song> songsToBeViewed;
     private ObservableList<String> genres;
-    private DataProcessor dataProcessor;
+    private SongProcessor songProcessor;
 
     public SongModel() throws Exception {
-        dataProcessor = new DataProcessor();
+        songProcessor = new SongProcessor();
         songsToBeViewed = FXCollections.observableArrayList();
-        songsToBeViewed.addAll(dataProcessor.getAllSongs());
+        songsToBeViewed.addAll(songProcessor.getAllSongs());
 
         genres = FXCollections.observableArrayList();
-        genres.addAll(dataProcessor.getAllGenres());
+        genres.addAll(songProcessor.getAllGenres());
     }
 
     public ObservableList<Song> getObservableSongs() {
@@ -29,11 +29,11 @@ public class SongModel {
 
     public void updateGenres() throws Exception {
         genres.clear();
-        genres.addAll(dataProcessor.getAllGenres());
+        genres.addAll(songProcessor.getAllGenres());
     }
 
     public void createNewSong(Song song) throws Exception {
-        Song s = dataProcessor.createNewSong(song);
+        Song s = songProcessor.createNewSong(song);
         songsToBeViewed.add(s);
     }
 }
