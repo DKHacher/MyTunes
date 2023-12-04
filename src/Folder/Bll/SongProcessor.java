@@ -25,4 +25,16 @@ public class SongProcessor {
     public Song createNewSong(Song newSong) throws Exception {
         return musicDAO.createSong(newSong);
     }
+
+    public void updateSong(Song song) throws Exception {
+        musicDAO.updateSong(song);
+    }
+
+    public void deleteSong(Song song) throws Exception {
+        musicDAO.deleteSong(song);
+    }
+
+    public List<Song> filterSongs(String searchText) throws Exception {
+        return musicDAO.filterSongs(searchText);
+    }
 }

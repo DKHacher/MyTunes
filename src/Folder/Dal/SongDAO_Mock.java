@@ -41,4 +41,19 @@ public class SongDAO_Mock implements ISongDataAccess {
         songs.add(song);
         return song;
     }
+
+    @Override
+    public void updateSong(Song song) throws Exception {
+        return;
+    }
+
+    @Override
+    public void deleteSong(Song song) throws Exception {
+        return;
+    }
+
+    @Override
+    public List<Song> filterSongs(String searchText) throws Exception {
+        return null;
+    }
 }

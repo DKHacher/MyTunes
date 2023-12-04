@@ -47,7 +47,7 @@ public class SongDAO_DB implements ISongDataAccess {
 
         try (Connection conn = dbConnector.getConnection();
              Statement stmt = conn.createStatement()) {
-            String sql = "SELECT DISTINCT Genre FROM dbo.Song;";
+            String sql = "SELECT DISTINCT Genre FROM dbo.Song ORDER BY Genre ASC;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -86,6 +86,79 @@ public class SongDAO_DB implements ISongDataAccess {
             return new Song(id, song.getTitle(), song.getArtist(), song.getGenre(), song.getDuration(), song.getFilePath());
         } catch (SQLException e) {
             throw new Exception("Could not add song to DB", e);
+        }
+    }
+
+    @Override
+    public void updateSong(Song song) throws Exception {
+        // SQL command
+        String sql = "UPDATE dbo.Song SET Title = ?, Artist = ?, Genre = ?, Duration = ?, FilePath = ? WHERE ID = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setString(1, song.getTitle());
+            stmt.setString(2, song.getArtist());
+            stmt.setString(3, song.getGenre());
+            stmt.setInt(4, song.getDuration());  // Assuming duration is stored as an integer (milliseconds)
+            stmt.setString(5, song.getFilePath());
+            stmt.setInt(6, song.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new Exception("Could not update song", e);
+        }
+    }
+
+    @Override
+    public void deleteSong(Song song) throws Exception {
+        // SQL command
+        String sql = "DELETE FROM dbo.Song WHERE ID = ?;";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setInt(1, song.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Could not delete song", e);
+        }
+    }
+
+    @Override
+    public List<Song> filterSongs(String searchText) throws Exception {
+        List<Song> allSongs = new ArrayList<>();
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Song WHERE Title LIKE ? OR Artist LIKE ?")) {
+
+            // Set parameters for the PreparedStatement
+            String searchParam = "%" + searchText + "%";
+            stmt.setString(1, searchParam);
+            stmt.setString(2, searchParam);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String title = rs.getString("Title");
+                String artist = rs.getString("Artist");
+                String genre = rs.getString("Genre");
+                int duration = rs.getInt("Duration");
+                String filePath = rs.getString("FilePath");
+
+                Song song = new Song(id, title, artist, genre, duration, filePath);
+                allSongs.add(song);
+            }
+
+            return allSongs;
+        } catch (SQLException e) {
+            throw new Exception("Error filtering songs", e);
         }
     }
 }
