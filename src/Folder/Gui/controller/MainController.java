@@ -1,6 +1,8 @@
 package Folder.Gui.controller;
 
+import Folder.Be.Playlist;
 import Folder.Be.Song;
+import Folder.Gui.model.PlaylistModel;
 import Folder.Gui.model.SongDialogModel;
 import Folder.Gui.model.SongModel;
 import Folder.Gui.util.PlaybackHandler;
@@ -27,6 +29,11 @@ import java.io.File;
 import java.util.Optional;
 
 public class MainController {
+    @FXML private TableView tblPlaylists;
+    @FXML private TableColumn<Playlist, String> colPlistName;
+    @FXML private TableColumn<Playlist, String> colPlistSongs;
+    @FXML private TableColumn<Playlist, String> colPlistTime;
+
     @FXML private TableView tblSongs;
     @FXML private TableColumn<Song, String> colTitle;
     @FXML private TableColumn<Song, String> colArtist;
@@ -45,6 +52,7 @@ public class MainController {
     private final SongDialogModel songDialogModel;
     private final PlaybackHandler playbackHandler;
     private SongModel songModel;
+    private PlaylistModel playlistModel;
 
 
     public MainController() {
@@ -53,13 +61,24 @@ public class MainController {
 
         try {
             songModel = new SongModel();
+            playlistModel = new PlaylistModel();
         } catch (Exception e) {
             displayError(e);
             e.printStackTrace();
         }
     }
-
+    /*
+    * Frederik:
+    * I split the initialize method into songInitialize and playlistInitialize.
+    * because having both song and playlist in one initialize felt it was too big.
+    * maybe split more parts into their own segments, like Volume and CurrentlyPlaying initializers
+    * */
     public void initialize() {
+        songInitialize();
+        playlistInitialize();
+    }
+
+    public void songInitialize(){
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -89,8 +108,14 @@ public class MainController {
             double totalDur = playbackHandler.getTotalDuration();
             return new TimeStringConverter().toString((int) (totalDur * 1000));
         }, playbackHandler.totalDurationProperty().asObject()));
+    }
 
+    public void playlistInitialize(){
+        colPlistName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colPlistSongs.setCellValueFactory(new PropertyValueFactory<>("amountOfSongs"));
+        colPlistTime.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(new TimeStringConverter().toString(cellData.getValue().getPlaylistDuration())));
 
+        tblPlaylists.setItems(playlistModel.getObservablePlaylists());
     }
 
     @FXML

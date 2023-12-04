@@ -48,11 +48,11 @@
             </ImageView>
          </graphic></Button>
       <ListView layoutX="274.0" layoutY="100.0" prefHeight="435.0" prefWidth="140.0" />
-      <TableView layoutX="18.0" layoutY="100.0" prefHeight="435.0" prefWidth="228.0">
+      <TableView fx:id="tblPlaylists" layoutX="18.0" layoutY="100.0" prefHeight="435.0" prefWidth="228.0">
         <columns>
-          <TableColumn prefWidth="110.0" text="Name" />
-          <TableColumn minWidth="1.0" prefWidth="45.0" text="Songs" />
-            <TableColumn prefWidth="38.0" text="Time" />
+          <TableColumn fx:id="colPlistName" prefWidth="110.0" text="Name" />
+          <TableColumn fx:id="colPlistSongs" minWidth="1.0" prefWidth="45.0" text="Songs" />
+            <TableColumn fx:id="colPlistTime" prefWidth="71.19999694824219" text="Time" />
         </columns>
       </TableView>
       <TableView fx:id="tblSongs" layoutX="465.0" layoutY="100.0" prefHeight="435.0" prefWidth="393.0">
