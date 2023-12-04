@@ -58,7 +58,7 @@
          <columns>
             <TableColumn fx:id="colTitle" text="Title" />
             <TableColumn fx:id="colArtist" text="Artist" />
-            <TableColumn fx:id="colGenre" text="Category" />
+            <TableColumn fx:id="colGenre" text="Genre" />
             <TableColumn fx:id="colDuration" text="Time" />
          </columns>
       </TableView>
