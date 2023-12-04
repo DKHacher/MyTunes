@@ -20,7 +20,7 @@ public class SongModel {
         songsToBeViewed.addAll(songProcessor.getAllSongs());
 
         genres = FXCollections.observableArrayList();
-        genres.addAll(dataProcessor.getAllGenres());
+        genres.addAll(songProcessor.getAllGenres());
 
         playbackSongs = FXCollections.observableArrayList();
         playbackSongs.addAll(songsToBeViewed);
@@ -49,7 +49,7 @@ public class SongModel {
     }
 
     public void updateSong(Song updatedSong) throws Exception {
-        dataProcessor.updateSong(updatedSong);
+        songProcessor.updateSong(updatedSong);
 
         Optional<Song> matchingSong = songsToBeViewed.stream().filter(s -> s.getId() == updatedSong.getId()).findFirst();
         if (matchingSong.isPresent()) {
@@ -64,12 +64,12 @@ public class SongModel {
     }
 
     public void deleteSong(Song song) throws Exception {
-        dataProcessor.deleteSong(song);
+        songProcessor.deleteSong(song);
         songsToBeViewed.remove(song);
     }
 
     public void filterSongs(String searchTexT) throws Exception {
-        List<Song> filteredSongs = dataProcessor.filterSongs(searchTexT);
+        List<Song> filteredSongs = songProcessor.filterSongs(searchTexT);
         songsToBeViewed.clear();
         songsToBeViewed.addAll(filteredSongs);
     }
