@@ -9,6 +9,8 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
+import java.io.File;
+
 public class PlaybackHandler {
     private MediaPlayer currentPlayer;
     private Song currentSong;
@@ -46,27 +48,71 @@ public class PlaybackHandler {
     }
 
     public void play(Song song) {
-        if (currentPlayer != null && song.equals(currentSong)) {
-            currentPlayer.play();
-            isPlaying = true;
-            setVolume(volume.get());
-            currentPlayingSong.set(song.getTitle() + " by " + song.getArtist() + " is playing");
-            setPlayerTimeListener();
+        if (song.equals(currentSong) && currentPlayer != null) {
+            resumePlayback(song);
         } else {
-            if (currentPlayer != null) {
-                currentPlayer.stop();
-                isPlaying = false;
-            }
-
-            Media media = new Media(song.getFile().toURI().toString());
-            currentPlayer = new MediaPlayer(media);
-            currentSong = song;
-            currentPlayer.play();
-            isPlaying = true;
-            setVolume(volume.get());
-            currentPlayingSong.set(song.getTitle() + " by " + song.getArtist() + " is playing");
-            setPlayerTimeListener();
+            prepareNewSong(song);
         }
+    }
+
+    /**
+     * Resumes playback of current song.
+     */
+    private void resumePlayback(Song song) {
+        currentPlayer.play();
+        updatePlaybackState(true);
+        updateUI(song);
+    }
+
+    private void prepareNewSong(Song song) {
+        stopCurrentSong(song);
+
+        // Prepares new song.
+        currentPlayer = initializeNewPlayer(song.getFile());
+        currentSong = song;
+        currentPlayer.play();
+        updatePlaybackState(true);
+        updateUI(song);
+    }
+
+    private void stopCurrentSong(Song song) {
+        // This is to ensure that any previously playing song is stopped before playing a new song,
+        // avoiding having multiple songs play at once.
+        if (currentPlayer != null) {
+            currentPlayer.stop();
+            updatePlaybackState(false);
+        }
+    }
+
+    private MediaPlayer initializeNewPlayer(File file) {
+        try {
+            Media media = new Media(file.toURI().toString());
+            return new MediaPlayer(media);
+        } catch (Exception e) {
+            // Temporary: need to display error to user (need to throw exception instead)
+            // Problem: blocks GUI (JavaFX Application Thread) if system cannot find the specified file.
+            System.err.println("Error reading song file into player: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // UI code should be moved to a separate class - it is not the responsibility of this class.
+
+    private void updatePlaybackState(boolean isPlaying) {
+        this.isPlaying = isPlaying;
+    }
+
+    // UI code should be moved to a separate class - it is not the responsibility of this class.
+
+    private void updateUI(Song song) {
+        setVolume(volume.get());
+        currentPlayingSong.set(formatSongDisplay(song));
+        setPlayerTimeListener();
+    }
+
+    // UI code should be moved to a separate class - it is not the responsibility of this class.
+    private String formatSongDisplay(Song song) {
+        return song.getTitle() + " by " + song.getArtist() + " is playing";
     }
 
     public void pause() {
