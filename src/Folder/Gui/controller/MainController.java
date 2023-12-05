@@ -2,11 +2,13 @@ package Folder.Gui.controller;
 
 import Folder.Be.Playlist;
 import Folder.Be.Song;
+import Folder.Gui.model.PlaylistDialogModel;
 import Folder.Gui.model.PlaylistModel;
 import Folder.Gui.model.SongDialogModel;
 import Folder.Gui.model.SongModel;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
+import Folder.Gui.view.PlaylistDialogViewBuilder;
 import Folder.Gui.view.SongDialogViewBuilder;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -26,6 +28,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class MainController {
@@ -50,6 +53,7 @@ public class MainController {
     @FXML private Label totalDurLbl;
 
     private final SongDialogModel songDialogModel;
+    private final PlaylistDialogModel playlistDialogModel;
     private final PlaybackHandler playbackHandler;
     private SongModel songModel;
     private PlaylistModel playlistModel;
@@ -57,6 +61,7 @@ public class MainController {
 
     public MainController() {
         songDialogModel = new SongDialogModel();
+        playlistDialogModel = new PlaylistDialogModel();
         playbackHandler = new PlaybackHandler();
 
         try {
@@ -352,6 +357,114 @@ public class MainController {
             model.reset();
             tblSongs.refresh();
             return song;
+        } catch (Exception e) {
+            displayError(e);
+            return null;
+        }
+    }
+
+    @FXML
+    private void newPlaylist(ActionEvent actionEvent) {
+        try {
+            playlistDialog(PlaylistDialogViewBuilder.Mode.CREATE, null);
+        } catch (Exception e) {
+            displayError(e);
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void editPlaylist(ActionEvent actionEvent) {
+        Playlist selectedPlaylist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+        if (selectedPlaylist != null) {
+            try {
+                playlistDialog(PlaylistDialogViewBuilder.Mode.EDIT, selectedPlaylist);
+                playlistDialogModel.reset();
+            } catch (Exception e) {
+                displayError(e);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML//will do this one another day, just copied delete song, -frederik
+    private void deletePlaylist(ActionEvent actionEvent) {
+        /*Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+
+        if (selectedSong != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Deletion");
+            alert.setHeaderText("Delete Song");
+            alert.setContentText("Are you sure you want to delete the song: " + selectedSong.getTitle() + " by " + selectedSong.getArtist() + "?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    songModel.deleteSong(selectedSong);
+                } catch (Exception e) {
+                    displayError(e);
+                }
+            }
+        }*/
+    }
+    private void playlistDialog(PlaylistDialogViewBuilder.Mode mode, Playlist playlist) {
+        playlistDialogModel.setProperties(playlist);
+        Dialog<Playlist> dialog = new Dialog<>();
+        dialog.setTitle(mode == PlaylistDialogViewBuilder.Mode.CREATE ? "Create Playlist" : "Edit Playlist");
+
+        PlaylistDialogViewBuilder builder = new PlaylistDialogViewBuilder(
+                playlistDialogModel
+        );
+        Region content = builder.build();
+        dialog.getDialogPane().setContent(content);
+
+        // Dialog buttons
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+
+        Node okBtn = dialog.getDialogPane().lookupButton(ButtonType.OK);
+        //playlistDialogModel.isValidInputProperty().bind(Bindings.createBooleanBinding(this::isDataValid, songDialogModel.getBindableProperties()));
+        //okBtn.disableProperty().bind(playlistDialogModel.isValidInputProperty().not());
+
+        // Handle pressing the dialog buttons
+        dialog.setResultConverter(dialogBtn -> {
+            if (dialogBtn == ButtonType.OK) {
+                if (mode == PlaylistDialogViewBuilder.Mode.CREATE) {
+                    return createNewPlaylistFromModel(playlistDialogModel);
+                } else {
+                    return updatePlaylistFromModel(playlistDialogModel);
+                }
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+    }
+    private Playlist createNewPlaylistFromModel(PlaylistDialogModel model) {
+        try {
+            String name = model.getName();
+
+            Playlist newPlaylist = new Playlist(-1, name, new ArrayList<>());
+            playlistModel.createNewPlaylist(newPlaylist);
+            model.reset();
+            return newPlaylist;
+        } catch (Exception e) {
+            displayError(e);
+            return null;
+        }
+    }
+
+    private Playlist updatePlaylistFromModel(PlaylistDialogModel model) {
+        try {
+            int id = model.getId();
+            String name = model.getName();
+
+
+            Playlist playlist = new Playlist(id, name, new ArrayList<>());
+            playlistModel.updatePlaylist(playlist);
+            model.reset();
+            tblPlaylists.refresh();
+            return playlist;
         } catch (Exception e) {
             displayError(e);
             return null;

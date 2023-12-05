@@ -2,6 +2,7 @@ package Folder.Bll;
 
 import Folder.Be.Playlist;
 import Folder.Be.Playlist;
+import Folder.Be.Playlist;
 import Folder.Dal.IPlaylistDataAccess;
 import Folder.Dal.IPlaylistDataAccess;
 import Folder.Dal.PlaylistDAO_DB;
@@ -24,5 +25,12 @@ public class PlaylistProcessor {
 
     public Playlist createNewPlaylist(Playlist newPlaylist) throws Exception {
         return listDAO.createPlaylist(newPlaylist);
+    }
+    public void updatePlaylist(Playlist playlist) throws Exception {
+        listDAO.updatePlaylist(playlist);
+    }
+
+    public void deletePlaylist(Playlist playlist) throws Exception {
+        //listDAO.deletePlaylist(playlist);
     }
 }

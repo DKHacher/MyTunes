@@ -33,6 +33,9 @@ public class Playlist {
         return amountOfSongs;
     }
     public int getPlaylistDuration() { return playlistDuration;}
+    public void setName(String name) {
+        this.name = name;
+    }
 
     private int getTimeFromPlaylist(List<Song> allSongsInPlaylist){
         int time = 0;

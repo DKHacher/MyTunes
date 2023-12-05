@@ -101,4 +101,39 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
             throw new Exception("Could not add Playlist to DB", e);
         }
     }
-}
+    @Override
+    public void updatePlaylist(Playlist playlist) throws Exception {
+        // SQL command
+        String sql = "UPDATE dbo.Playlist SET Name = ? WHERE ID = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setString(1, playlist.getName());
+            stmt.setInt(2, playlist.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new Exception("Could not update song", e);
+        }
+    }
+
+    @Override
+    public void deletePlaylist(Playlist playlist) throws Exception {
+        // SQL command
+        String sql = "DELETE FROM dbo.Playlist WHERE ID = ?;";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Bind parameters
+            stmt.setInt(1, playlist.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Could not delete playlist", e);
+        }
+    }}
