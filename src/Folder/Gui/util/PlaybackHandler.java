@@ -1,7 +1,7 @@
 package Folder.Gui.util;
 
 import Folder.Be.Song;
-import Folder.Bll.SongPlaybackException;
+import Folder.Common.SongPlaybackException;
 import Folder.Gui.model.PlaybackModel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -38,7 +38,7 @@ public class PlaybackHandler {
         if (song == null) throw new NullPointerException("Song cannot be null");
 
         //String filePath = AppConfig.INSTANCE.getProperty("fileDirectory") + song.getFilePath();
-        String filePath = song.getFilePath();
+        String filePath = song.getFilePath(); // For testing, need to change Song table in DB to use fileName only and not full filePath
 
         File file = new File(filePath);
         if (!file.exists() || !isPlayableFormat(file)) {
@@ -61,7 +61,6 @@ public class PlaybackHandler {
                 model.setCurrentSong(song);
                 model.setIsPlaying(true);
             } catch (MediaException e) {
-                System.out.println("kakao");
                 throw new SongPlaybackException(
                         "Error playing the song: " + filePath + "\n" +
                                 "Check if the music file isn't corrupted."
