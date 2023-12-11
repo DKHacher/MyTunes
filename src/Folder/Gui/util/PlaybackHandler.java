@@ -1,208 +1,168 @@
 package Folder.Gui.util;
 
 import Folder.Be.Song;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import Folder.Bll.SongPlaybackException;
+import Folder.Gui.model.PlaybackModel;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.io.File;
 
 public class PlaybackHandler {
+    private static final double START_VOLUME = 50.0;
+
+    private final PlaybackModel model;
+
     private MediaPlayer currentPlayer;
-    private Song currentSong;
-    private boolean isPlaying;
-    private boolean isMuted;
+    private double savedVolume;
 
-    private DoubleProperty volume = new SimpleDoubleProperty(50.0);
-    private StringProperty currentPlayingSong = new SimpleStringProperty("(None) is playing");
-    private DoubleProperty currentSongPosition = new SimpleDoubleProperty(0.0);
-    private DoubleProperty currentTimeProperty = new SimpleDoubleProperty(0.0);
-    private DoubleProperty totalDurationProperty = new SimpleDoubleProperty(0.0);
-    private Double savedVolume = 50.0;
-
-    public PlaybackHandler() {
-        isPlaying = false;
-        isMuted = false;
-
-        volume.addListener((obs, ov, nv) -> setVolume(nv.doubleValue()));
+    public PlaybackHandler(PlaybackModel model) {
+        this.model = model;
+        model.setVolume(START_VOLUME);
     }
 
-    private void setPlayerTimeListener() {
-        if (currentPlayer != null) {
-            currentPlayer.currentTimeProperty().addListener((obs, ov, nv) -> {
-                    double curPos = nv.toSeconds();
-                    double totalDur = getTotalDuration();
-                    double scaledPos = (curPos / totalDur) * 100.0;
-                    currentSongPosition.set(scaledPos);
-                    currentTimeProperty.set(nv.toSeconds());
-            });
+    /**
+     * Plays the specified song.<br>
+     * <br>
+     * If the same song is currently playing, playback will continue without restarting the song.<br>
+     * For example, if song 'a' is playing, then playing song 'a' again won't have any effect.
+     *
+     * @param song the song to be played. Requires that the song is not null and is a valid, playable song.
+     *             That is, the song must have a valid file path and format (.mp3 or .wav).
+     * @throws SongPlaybackException if the song cannot be played due to e.g., being corrupted or having an invalid file path or format (.mp3 or .wav).
+     * @throws NullPointerException if the song is null.
+     */
+    public void play(Song song) throws SongPlaybackException {
+        if (song == null) throw new NullPointerException("Song cannot be null");
 
-            currentPlayer.totalDurationProperty().addListener((obs, ov, nv) -> {
-                    totalDurationProperty.set(nv.toSeconds());
-            });
+        //String filePath = AppConfig.INSTANCE.getProperty("fileDirectory") + song.getFilePath();
+        String filePath = song.getFilePath();
+
+        File file = new File(filePath);
+        if (!file.exists() || !isPlayableFormat(file)) {
+            throw new SongPlaybackException("Error playing the song: " + filePath + "\nInvalid file path or format");
         }
-    }
 
-    public void play(Song song) {
-        if (song.equals(currentSong) && currentPlayer != null) {
-            resumePlayback(song);
+        if (song.equals(model.getCurrentSong()) && currentPlayer != null) {
+            currentPlayer.play();
+            model.setIsPlaying(true);
         } else {
-            prepareNewSong(song);
+            if (currentPlayer != null) {
+                currentPlayer.stop();
+                currentPlayer.dispose();
+                model.setIsPlaying(false);
+            }
+
+            try {
+                initializeNewPlayer(file);
+                currentPlayer.play();
+                model.setCurrentSong(song);
+                model.setIsPlaying(true);
+            } catch (MediaException e) {
+                System.out.println("kakao");
+                throw new SongPlaybackException(
+                        "Error playing the song: " + filePath + "\n" +
+                                "Check if the music file isn't corrupted."
+                );
+            }
         }
     }
 
     /**
-     * Resumes playback of current song.
+     * Pauses the playback.<br>
+     * <br>
+     * If a song is playing, it is paused without changing the current position in the song.
      */
-    private void resumePlayback(Song song) {
-        currentPlayer.play();
-        updatePlaybackState(true);
-        updateUI(song);
-    }
-
-    private void prepareNewSong(Song song) {
-        stopCurrentSong(song);
-
-        // Prepares new song.
-        currentPlayer = initializeNewPlayer(song.getFile());
-        currentSong = song;
-        currentPlayer.play();
-        updatePlaybackState(true);
-        updateUI(song);
-    }
-
-    private void stopCurrentSong(Song song) {
-        // This is to ensure that any previously playing song is stopped before playing a new song,
-        // avoiding having multiple songs play at once.
-        if (currentPlayer != null) {
-            currentPlayer.stop();
-            updatePlaybackState(false);
-        }
-    }
-
-    private MediaPlayer initializeNewPlayer(File file) {
-        try {
-            Media media = new Media(file.toURI().toString());
-            return new MediaPlayer(media);
-        } catch (Exception e) {
-            // Temporary: need to display error to user (need to throw exception instead)
-            // Problem: blocks GUI (JavaFX Application Thread) if system cannot find the specified file.
-            System.err.println("Error reading song file into player: " + e.getMessage());
-            return null;
-        }
-    }
-
-    // UI code should be moved to a separate class - it is not the responsibility of this class.
-
-    private void updatePlaybackState(boolean isPlaying) {
-        this.isPlaying = isPlaying;
-    }
-
-    // UI code should be moved to a separate class - it is not the responsibility of this class.
-
-    private void updateUI(Song song) {
-        setVolume(volume.get());
-        currentPlayingSong.set(formatSongDisplay(song));
-        setPlayerTimeListener();
-    }
-
-    // UI code should be moved to a separate class - it is not the responsibility of this class.
-    private String formatSongDisplay(Song song) {
-        return song.getTitle() + " by " + song.getArtist() + " is playing";
-    }
-
     public void pause() {
         if (currentPlayer != null) {
             currentPlayer.pause();
-            isPlaying = false;
-            currentPlayingSong.set(currentSong.getTitle() + " by " + currentSong.getArtist() + " is paused");
+            model.setIsPlaying(false);
         }
     }
 
-    public boolean isPlaying() {
-        return isPlaying;
+    /**
+     * Seeks to a specified position in the current song.
+     *
+     * @param position the position to seek to, must be within the range of 0.0 and 100.0.
+     * @throws IllegalArgumentException if position is out of the valid range.
+     */
+    public void seek(double position) throws IllegalArgumentException {
+        if (position < 0.0 || position > 100.0) {
+            throw new IllegalArgumentException("Position must be between 0.0 and 100.0");
+        }
+
+        if (currentPlayer != null && model.getCurrentSong() != null) {
+            double totalDuration = currentPlayer.getTotalDuration().toSeconds();
+            double seekPosition = (position / 100.0) * totalDuration;
+            currentPlayer.seek(Duration.seconds(seekPosition));
+        }
     }
 
-    public boolean isMuted() {
-        return isMuted;
-    }
+    /**
+     * Sets the playback volume.
+     *
+     * @param volume the volume level to be set, must be within the range of 0.0 and 100.0.
+     * @throws IllegalArgumentException if volume is out of the valid range.
+     */
+    public void setVolume(double volume) throws IllegalArgumentException {
+        if (volume < 0.0 || volume > 100.0) {
+            throw new IllegalArgumentException("Volume must be between 0.0 and 100.0");
+        }
 
-    public Song getCurrentSong() {
-        return currentSong;
-    }
-
-    public DoubleProperty volumeProperty() {
-        return volume;
-    }
-
-    public double getVolume() {
-        return volume.get();
-    }
-
-    public void setVolume(double volume) {
-        this.volume.set(volume);
+        model.setVolume(volume);
         if (currentPlayer != null) {
             currentPlayer.setVolume(volume / 100.0);
-            isMuted = volume == 0.0;
+            model.setIsMuted(volume == 0.0);
         }
     }
 
+    /**
+     * Mutes the playback.
+     */
     public void mute() {
-        if (!isMuted) {
-            savedVolume = volume.get();
+        if (!model.getIsMuted()) {
+            savedVolume = model.getVolume();
             setVolume(0.0);
-            isMuted = true;
+            model.setIsMuted(true);
         }
     }
 
+    /**
+     * Unmutes the playback.<br>
+     * Restores the playback to the previous volume level.
+     */
     public void unmute() {
-        if (isMuted) {
+        if (model.getIsMuted()) {
             setVolume(savedVolume);
-            isMuted = false;
+            model.setIsMuted(false);
         }
     }
 
-    public void seek(Double pos) {
-        currentPlayer.seek(Duration.seconds(pos));
-        play(currentSong);
+    private boolean isPlayableFormat(File file) {
+        String fileName = file.getName().toLowerCase();
+        return fileName.endsWith(".mp3") || fileName.endsWith(".wav");
     }
 
-    public StringProperty currentPlayingSongProperty() {
-        return currentPlayingSong;
-    }
+    private void initializeNewPlayer(File file) throws MediaException {
+        Media media = new Media(file.toURI().toString());
+        currentPlayer = new MediaPlayer(media);
+        currentPlayer.setVolume(model.getVolume() / 100.0);
 
-    public DoubleProperty currentSongPositionProperty() {
-        return currentSongPosition;
-    }
-
-    public Double getTotalDuration() {
-        if (currentPlayer != null) {
-            Duration totalDur = currentPlayer.getTotalDuration();
-            if (totalDur != null) {
-                return totalDur.toSeconds();
+        currentPlayer.totalDurationProperty().addListener((obs, ov, nv) -> {
+            if (nv != null) {
+                model.setTotalDuration(nv.toSeconds());
             }
-        }
+        });
 
-        return 0.0;
-    }
-
-    public Double getCurrentTime() {
-        if (currentPlayer != null) {
-            return currentPlayer.getCurrentTime().toSeconds();
-        }
-
-        return 0.0;
-    }
-
-    public DoubleProperty currentTimeProperty() {
-        return currentTimeProperty;
-    }
-
-    public DoubleProperty totalDurationProperty() {
-        return totalDurationProperty;
+        currentPlayer.currentTimeProperty().addListener((obs, ov, nv) -> {
+            if (nv != null) {
+                double currentPosition = nv.toSeconds();
+                double totalDuration = currentPlayer.getTotalDuration().toSeconds();
+                model.setCurrentPosition((currentPosition / totalDuration) * 100.0);
+                model.setCurrenTime(nv.toSeconds());
+            }
+        });
     }
 }
