@@ -2,17 +2,16 @@ package Folder.Gui.controller;
 
 import Folder.Be.Playlist;
 import Folder.Be.Song;
-import Folder.Gui.model.PlaylistDialogModel;
-import Folder.Gui.model.PlaylistModel;
-import Folder.Gui.model.SongDialogModel;
-import Folder.Gui.model.SongModel;
+import Folder.Common.SongPlaybackException;
+import Folder.Gui.model.*;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
 import Folder.Gui.view.SongDialogViewBuilder;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -30,6 +29,7 @@ import javafx.util.Duration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainController {
     @FXML private TableView tblPlaylists;
@@ -55,6 +55,7 @@ public class MainController {
     private final SongDialogModel songDialogModel;
     private final PlaylistDialogModel playlistDialogModel;
     private final PlaybackHandler playbackHandler;
+    private final PlaybackModel playbackModel;
     private SongModel songModel;
     private PlaylistModel playlistModel;
 
@@ -62,7 +63,8 @@ public class MainController {
     public MainController() {
         songDialogModel = new SongDialogModel();
         playlistDialogModel = new PlaylistDialogModel();
-        playbackHandler = new PlaybackHandler();
+        playbackModel = new PlaybackModel();
+        playbackHandler = new PlaybackHandler(playbackModel);
 
         try {
             songModel = new SongModel();
@@ -81,6 +83,71 @@ public class MainController {
     public void initialize() {
         songInitialize();
         playlistInitialize();
+        playbackInitialize();
+    }
+
+    public void playbackInitialize() {
+        initializePlayPauseBinding();
+
+        AtomicBoolean isDragging = new AtomicBoolean(false);
+        playbackSlider.setOnMousePressed(evt -> {
+            isDragging.set(true);
+        });
+
+        playbackSlider.setOnMouseReleased(evt -> {
+            playbackHandler.seek(playbackSlider.getValue());
+            isDragging.set(false);
+        });
+
+        playbackSlider.valueProperty().addListener((obs, ov, nv) -> {
+            if (isDragging.get()) {
+                double newPosition = nv.doubleValue();
+                double totalDuration = playbackModel.getTotalDuration();
+                double newTime = newPosition / 100.0 * totalDuration;
+                updateCurrentTimeLabel(newTime);
+            } else {
+                playbackModel.setCurrentPosition(nv.doubleValue());
+            }
+        });
+
+        playbackModel.currentPositionProperty().addListener((obs, ov, nv) -> {
+            if (!isDragging.get()) {
+                playbackSlider.setValue(nv.doubleValue());
+            }
+        });
+
+        playbackModel.currenTimeProperty().addListener((obs, ov, nv) -> {
+            if (!isDragging.get()) {
+                updateCurrentTimeLabel(nv.doubleValue());
+            }
+        });
+
+        totalDurLbl.textProperty().bind(Bindings.createStringBinding(() -> {
+            double totalDur = playbackModel.getTotalDuration();
+            return new TimeStringConverter().toString((int) (totalDur * 1000));
+        }, playbackModel.totalDurationProperty().asObject()));
+
+        volumeSlider.valueProperty().bindBidirectional(playbackModel.volumeProperty());
+
+        volumeSlider.valueProperty().addListener((obs, ov, nv) -> {
+            playbackHandler.setVolume(nv.doubleValue());
+        });
+
+        playbackModel.currentSongProperty().addListener((obs, ov, nv) ->
+            Platform.runLater(() -> {
+                if (nv != null) {
+                    currentPlayingLbl.setText(nv.getTitle() + " by " + nv.getArtist());
+                } else {
+                    currentPlayingLbl.setText("(None) is playing");
+                }
+            })
+        );
+
+        playbackHandler.setQueue(songModel.getObservableSongs());
+    }
+
+    private void updateCurrentTimeLabel(double currentTimeInSeconds) {
+        curTimeLbl.setText(new TimeStringConverter().toString((int) (currentTimeInSeconds * 1000)));
     }
 
     public void songInitialize(){
@@ -91,29 +158,8 @@ public class MainController {
 
         tblSongs.setItems(songModel.getObservableSongs());
 
-        volumeSlider.valueProperty().bindBidirectional(playbackHandler.volumeProperty());
-        currentPlayingLbl.textProperty().bind(playbackHandler.currentPlayingSongProperty());
-
-
-        playbackSlider.valueProperty().bindBidirectional(playbackHandler.currentSongPositionProperty());
-
-        playbackSlider.setOnMousePressed(evt -> playbackHandler.pause());
-        playbackSlider.setOnMouseReleased(evt -> {
-            double newPos = playbackSlider.getValue();
-            double totalDur = playbackHandler.getTotalDuration();
-            playbackHandler.seek((newPos / 100.0) * totalDur);
-        });
-
-        curTimeLbl.textProperty().bind(Bindings.createStringBinding(() -> {
-            double curTime = playbackHandler.getCurrentTime();
-            return new TimeStringConverter().toString((int) (curTime * 1000));
-        }, playbackHandler.currentTimeProperty().asObject()));
-
-        totalDurLbl.textProperty().bind(Bindings.createStringBinding(() -> {
-            double totalDur = playbackHandler.getTotalDuration();
-            return new TimeStringConverter().toString((int) (totalDur * 1000));
-        }, playbackHandler.totalDurationProperty().asObject()));
     }
+
 
     public void playlistInitialize(){
         colPlistName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -184,59 +230,35 @@ public class MainController {
     @FXML
     private void playSong(ActionEvent event) {
         Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
-
-        if (!playbackHandler.isPlaying() && selectedSong != null) {
-            togglePlayPauseIcon(true);
-            playbackHandler.play(selectedSong);
-        } else if (playbackHandler.isPlaying()) {
-            togglePlayPauseIcon(false);
-            playbackHandler.pause();
-        }
-    }
-
-    @FXML
-    private void nextSong(ActionEvent event) {
-        if (playbackHandler.isPlaying()) {
-            Song curSong = playbackHandler.getCurrentSong();
-            if (curSong != null) {
-                ObservableList<Song> playbackSongs = songModel.getPlaybackSongs();
-                int curIndex = playbackSongs.indexOf(curSong);
-
-                if (curIndex >= 0) {
-                    int nextIndex = curIndex + 1;
-                    if (nextIndex < playbackSongs.size()) {
-                        playbackHandler.play(playbackSongs.get(nextIndex));
+        Task<Void> playTask = new Task<>() {
+            @Override
+            protected Void call() throws SongPlaybackException {
+                if (!playbackModel.getIsPlaying()) {
+                    if (selectedSong != null) {
+                        playbackHandler.play(selectedSong);
+                    } else {
+                        playbackHandler.playQueue();
                     }
+                } else {
+                    playbackHandler.pause();
                 }
+                return null;
             }
-        }
+        };
+
+        playTask.setOnFailed(e -> {
+            Throwable exception = playTask.getException();
+            displayError(exception);
+        });
+
+        new Thread(playTask).start();
+
     }
 
-    @FXML
-    private void prevSong(ActionEvent event) {
-        if (playbackHandler.isPlaying()) {
-            Song curSong = playbackHandler.getCurrentSong();
-            if (curSong != null) {
-                ObservableList<Song> playbackSongs = songModel.getPlaybackSongs();
-                int curIndex = playbackSongs.indexOf(curSong);
-
-                if (curIndex >= 0) {
-                    int prevIndex = curIndex - 1;
-                    if (prevIndex >= 0) {
-                        playbackHandler.play(playbackSongs.get(prevIndex));
-                    }
-                }
-            }
-        }
-    }
-
-    @FXML
-    private void muteVolume(ActionEvent event) {
-        if (playbackHandler.isMuted()) {
-            playbackHandler.unmute();
-        } else {
-            playbackHandler.mute();
-        }
+    private void initializePlayPauseBinding() {
+        playbackModel.isPlayingProperty().addListener((obs, wasPlaying, isPlaying) -> {
+            togglePlayPauseIcon(isPlaying);
+        });
     }
 
     private void togglePlayPauseIcon(boolean isPlaying) {
@@ -244,6 +266,25 @@ public class MainController {
             playPauseImageView.setImage(new Image("/Images/pause.png"));
         } else {
             playPauseImageView.setImage(new Image("/Images/one-right.png"));
+        }
+    }
+
+    @FXML
+    private void nextSong(ActionEvent event) {
+        playbackHandler.nextSong();
+    }
+
+    @FXML
+    private void prevSong(ActionEvent event) {
+        playbackHandler.previousSong();
+    }
+
+    @FXML
+    private void muteVolume(ActionEvent event) {
+        if (playbackModel.getIsMuted()) {
+            playbackHandler.unmute();
+        } else {
+            playbackHandler.mute();
         }
     }
 
@@ -315,6 +356,7 @@ public class MainController {
             songDialogModel.setTitle(title != null ? title : "");
             songDialogModel.setDuration(millis);
         });
+        //mediaPlayer.dispose();
     }
 
     private boolean isDataValid() {

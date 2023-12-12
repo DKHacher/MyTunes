@@ -1,6 +1,7 @@
 package Folder.Be;
 
 import java.io.File;
+import java.util.Objects;
 
 public class Song {
     private int id;
@@ -77,5 +78,18 @@ public class Song {
                 ", duration=" + duration +
                 ", filePath='" + filePath + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Song song = (Song) o;
+        return id == song.id && duration == song.duration && Objects.equals(title, song.title) && Objects.equals(artist, song.artist) && Objects.equals(genre, song.genre) && Objects.equals(filePath, song.filePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, artist, genre, duration, filePath);
     }
 }

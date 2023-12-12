@@ -1,4 +1,4 @@
-package Folder.Gui.util;
+package Folder.Bll;
 
 import Folder.Be.Song;
 
@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Represents a queue of songs to be played in a media player.<br>
+ * Manages a queue of songs to be played in a media player.<br>
  * <br>
- * Allows for navigating through the list of songs, including selecting a specific song,
- * moving to the next or previous song, and retrieving the current song in the queue.
+ * Allows for navigating through the queue, by moving to the next,
+ * previous, first, or a specific song, and keeping track of the current song.
  */
 public class SongQueue {
     private final List<Song> queue;
     private int currentIndex;
 
     /**
-     * Constructs a SongQueue with a provided list of songs.<br>
+     * Initializes a new SongQueue with a list of songs.<br>
      * <br>
      * The songs in the queue are managed in the order they appear in the list.<br>
      * The queue initially starts at the beginning of the list.
