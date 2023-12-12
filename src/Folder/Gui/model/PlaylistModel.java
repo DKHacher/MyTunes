@@ -1,7 +1,6 @@
 package Folder.Gui.model;
 
 import Folder.Be.Playlist;
-import Folder.Be.Playlist;
 import Folder.Bll.PlaylistProcessor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +22,7 @@ public class PlaylistModel {
     }
 
 
+
     public void createNewPlaylist(Playlist Playlist) throws Exception {
         Playlist s = PlaylistProcessor.createNewPlaylist(Playlist);
         PlaylistsToBeViewed.add(s);
@@ -39,8 +39,8 @@ public class PlaylistModel {
         }
     }
 
-    /*public void deletePlaylist(Playlist playlist) throws Exception {
-        playlistProcessor.deletePlaylist(playlist);
-        playlistsToBeViewed.remove(playlist);
-    }*/
+    public void deletePlaylist(Playlist playlist) throws Exception {
+        PlaylistProcessor.deletePlaylist(playlist);
+        PlaylistsToBeViewed.remove(playlist);
+    }
 }

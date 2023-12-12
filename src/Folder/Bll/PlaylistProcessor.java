@@ -1,11 +1,7 @@
 package Folder.Bll;
 
 import Folder.Be.Playlist;
-import Folder.Be.Playlist;
-import Folder.Be.Playlist;
 import Folder.Dal.IPlaylistDataAccess;
-import Folder.Dal.IPlaylistDataAccess;
-import Folder.Dal.PlaylistDAO_DB;
 import Folder.Dal.PlaylistDAO_DB;
 
 import java.io.IOException;
@@ -31,6 +27,6 @@ public class PlaylistProcessor {
     }
 
     public void deletePlaylist(Playlist playlist) throws Exception {
-        //listDAO.deletePlaylist(playlist);
+        listDAO.deletePlaylist(playlist);
     }
 }

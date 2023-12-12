@@ -20,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainController {
+    @FXML private ListView lstSongsInPlaylist;
     @FXML private TableView tblPlaylists;
     @FXML private TableColumn<Playlist, String> colPlistName;
     @FXML private TableColumn<Playlist, String> colPlistSongs;
@@ -167,6 +169,14 @@ public class MainController {
         colPlistTime.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(new TimeStringConverter().toString(cellData.getValue().getPlaylistDuration())));
 
         tblPlaylists.setItems(playlistModel.getObservablePlaylists());
+    }
+
+    public void playlistSongsRefresh(){
+        Playlist selectedPlaylist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+        lstSongsInPlaylist.getItems().clear();
+        if (selectedPlaylist != null){
+            lstSongsInPlaylist.getItems().addAll(selectedPlaylist.getSongsInPlaylistAsString());
+        }
     }
 
     @FXML
@@ -429,26 +439,19 @@ public class MainController {
         }
     }
 
-    @FXML//will do this one another day, just copied delete song, -frederik
+    @FXML
     private void deletePlaylist(ActionEvent actionEvent) {
-        /*Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+        Playlist selectedPlaylist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+        if (selectedPlaylist != null) {
+            try {
+                playlistModel.deletePlaylist(selectedPlaylist);
+                tblPlaylists.refresh();
 
-        if (selectedSong != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirm Deletion");
-            alert.setHeaderText("Delete Song");
-            alert.setContentText("Are you sure you want to delete the song: " + selectedSong.getTitle() + " by " + selectedSong.getArtist() + "?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                try {
-                    songModel.deleteSong(selectedSong);
-                } catch (Exception e) {
-                    displayError(e);
-                }
+            } catch (Exception e) {
+                displayError(e);
+                e.printStackTrace();
             }
-        }*/
+        }
     }
     private void playlistDialog(PlaylistDialogViewBuilder.Mode mode, Playlist playlist) {
         playlistDialogModel.setProperties(playlist);
@@ -511,5 +514,9 @@ public class MainController {
             displayError(e);
             return null;
         }
+    }
+
+    public void tblPlaylistMouseClick(MouseEvent mouseEvent) {
+        playlistSongsRefresh();
     }
 }

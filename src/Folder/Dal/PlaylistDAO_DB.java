@@ -42,7 +42,13 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
     attempting to get all songs associated with a playlist
     this code is cursed, I want someone else to look at it and
     tell me if what im doing could be done better
-    i hate how this looks, and i wrote it -still Frederik
+    i hate how this looks, and i wrote it.
+
+    Frederik:
+    ive taken a closer look, and i think this is still the best way to do so.
+    but if i could, i would make a bulk import of songs rather than a while loop.
+    lots of unnecessary calls to the database.
+    i know it can be done better, but cannot remember how.
     */
     @Override
     public List<Song> getAllSongsInPlaylist(int id) throws Exception {
@@ -78,6 +84,8 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
 
 
     @Override
+    // Frederik: when we generate a new id for the playlist, it remembers deleted playlists id and will generate a new id for the next playlist
+    // example would be to create a playlist, newest one we have is number 9, but 5-8 is deleted and so should not count
     public Playlist createPlaylist(Playlist playlist) throws Exception {
         String sql = "INSERT INTO dbo.Playlist (Name) VALUES (?);";
 
@@ -124,13 +132,16 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
     public void deletePlaylist(Playlist playlist) throws Exception {
         // SQL command
         String sql = "DELETE FROM dbo.Playlist WHERE ID = ?;";
+        String sql2 = "DELETE FROM dbo.SongPlaylist WHERE PlaylistID = ?;";
 
         try (Connection conn = dbConnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql);PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
             // Bind parameters
             stmt.setInt(1, playlist.getId());
+            stmt2.setInt(1, playlist.getId());
 
             // Run the specified SQL statement
+            stmt.executeUpdate();
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

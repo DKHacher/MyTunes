@@ -47,8 +47,8 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <ListView layoutX="274.0" layoutY="100.0" prefHeight="435.0" prefWidth="140.0" />
-      <TableView fx:id="tblPlaylists" layoutX="18.0" layoutY="100.0" prefHeight="435.0" prefWidth="228.0">
+      <ListView fx:id="lstSongsInPlaylist" layoutX="274.0" layoutY="100.0" prefHeight="435.0" prefWidth="140.0" />
+      <TableView fx:id="tblPlaylists" layoutX="18.0" layoutY="100.0" onMouseClicked="#tblPlaylistMouseClick" prefHeight="435.0" prefWidth="228.0">
         <columns>
           <TableColumn fx:id="colPlistName" prefWidth="110.0" text="Name" />
           <TableColumn fx:id="colPlistSongs" minWidth="1.0" prefWidth="45.0" text="Songs" />

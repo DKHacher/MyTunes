@@ -1,5 +1,8 @@
 package Folder.Be;
 
+import Folder.Gui.util.TimeStringConverter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist {
@@ -44,7 +47,17 @@ public class Playlist {
         }
         return time;
     }
-
+    public List<String> getSongsInPlaylistAsString(){
+        List<String> StringSongList = new ArrayList<>();
+        int i = 1;
+    for (Song song: songList) {
+        String duration = new TimeStringConverter().toString(song.getDuration());
+        StringSongList.add(i + ", " + song.getTitle() + ", " + duration);
+        i++;
+    }
+    return StringSongList;
+    }
+    
 
 }
 

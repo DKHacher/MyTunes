@@ -1,0 +1,7 @@
+Frederik: when we generate a new id for the playlist,
+it remembers deleted playlists id and will generate a new id for the next playlist,
+an example would be to create a playlist, newest one we have is number 9, but 5-8 is deleted and so should not count
+
+Frederik: we either need to shorthen the tiles somehow or lengthen the SongListBox (or remove some other items from it)
+as it is, names overflow and become unreadable.
+
