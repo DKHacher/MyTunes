@@ -47,6 +47,8 @@ public class MainController {
 
     @FXML private TextField searchField;
     @FXML private Button btnPlay;
+    @FXML private Button btnEdit;
+    @FXML private Button btnDelete;
     @FXML private ImageView playPauseImageView;
     @FXML private Slider volumeSlider;
     @FXML private Label currentPlayingLbl;
@@ -159,6 +161,21 @@ public class MainController {
         colDuration.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(new TimeStringConverter().toString(cellData.getValue().getDuration())));
 
         tblSongs.setItems(songModel.getObservableSongs());
+
+        tblSongs.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
+            Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+            Song currentSong = playbackModel.getCurrentSong();
+
+            btnEdit.setDisable(selectedSong != null && selectedSong.equals(currentSong));
+            btnDelete.setDisable(selectedSong != null && selectedSong.equals(currentSong));
+        });
+
+        playbackModel.currentSongProperty().addListener((obs, ov, nv) -> {
+            Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
+
+            btnEdit.setDisable(selectedSong != null && selectedSong.equals(nv));
+            btnDelete.setDisable(selectedSong != null && selectedSong.equals(nv));
+        });
 
     }
 
