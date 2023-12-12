@@ -14,16 +14,24 @@ import javafx.util.Builder;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Responsible for building the user interface for the song dialog.<br>
+ * <br>
+ * It creates a layout to display and edit properties of a song, including title, artist, genre, duration, and file selection.<br>
+ * The class uses a SongDialogModel to bind UI elements to the data model and handles user interactions for file selection.
+ */
 public class SongDialogViewBuilder implements Builder<Region> {
-    public enum Mode {
-        CREATE,
-        EDIT
-    }
+    private final SongDialogModel model;
+    private final List<String> genres;
+    private final Consumer<TextField> fileChooserConsumer;
 
-    SongDialogModel model;
-    List<String> genres;
-    private Consumer<TextField> fileChooserConsumer;
-
+    /**
+     * Initializes a new SongDialogViewBuilder with the specified model, genre list, and file chooser functionality.
+     *
+     * @param model the SongDialogModel that holds the data for the song
+     * @param genres a list of strings representing the available music genres
+     * @param fileChooserConsumer a consumer that handles the action of choosing a file
+     */
     public SongDialogViewBuilder(SongDialogModel model, List<String> genres, Consumer<TextField> fileChooserConsumer) {
         this.model = model;
         this.genres = genres;

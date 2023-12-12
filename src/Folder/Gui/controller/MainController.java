@@ -4,6 +4,7 @@ import Folder.Be.Playlist;
 import Folder.Be.Song;
 import Folder.Common.SongPlaybackException;
 import Folder.Gui.model.*;
+import Folder.Gui.util.DialogBuilder;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
@@ -29,8 +30,11 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class MainController {
     @FXML private ListView lstSongsInPlaylist;
@@ -162,6 +166,7 @@ public class MainController {
 
         tblSongs.setItems(songModel.getObservableSongs());
 
+        // Used to disable/enable buttons when selecting other songs & the playing song in the TableView.
         tblSongs.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
             Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
             Song currentSong = playbackModel.getCurrentSong();
@@ -170,6 +175,7 @@ public class MainController {
             btnDelete.setDisable(selectedSong != null && selectedSong.equals(currentSong));
         });
 
+        // Used to disable buttons immediately when playing song that is selected.
         playbackModel.currentSongProperty().addListener((obs, ov, nv) -> {
             Song selectedSong = (Song) tblSongs.getSelectionModel().getSelectedItem();
 
@@ -200,7 +206,7 @@ public class MainController {
     private void newSong(ActionEvent event) {
         try {
             songModel.updateGenres();
-            songDialog(SongDialogViewBuilder.Mode.CREATE, null);
+            songDialog(null);
         } catch (Exception e) {
             displayError(e);
             e.printStackTrace();
@@ -213,7 +219,7 @@ public class MainController {
         if (selectedSong != null) {
             try {
                 songModel.updateGenres();
-                songDialog(SongDialogViewBuilder.Mode.EDIT, selectedSong);
+                songDialog(selectedSong);
                 songDialogModel.reset();
             } catch (Exception e) {
                 displayError(e);
@@ -315,39 +321,28 @@ public class MainController {
         }
     }
 
-    private void songDialog(SongDialogViewBuilder.Mode mode, Song song) {
-        songDialogModel.setProperties(song);
-        Dialog<Song> dialog = new Dialog<>();
-        dialog.setTitle(mode == SongDialogViewBuilder.Mode.CREATE ? "Create Song" : "Edit Song");
+    private void songDialog(Song song) {
+        String dialogTitle = (song == null) ? "Create Song" : "Edit Song";
 
-        SongDialogViewBuilder builder = new SongDialogViewBuilder(
-                songDialogModel,
-                songModel.getObservableGenres(),
-                this::chooseFile
-        );
-        Region content = builder.build();
-        dialog.getDialogPane().setContent(content);
+        Dialog<Song> songDialog = new DialogBuilder<Song>(new SongDialogController(song, songModel.getObservableGenres()))
+                .withTitle(dialogTitle)
+                .addButtonTypes(ButtonType.OK, ButtonType.CANCEL)
+                .build();
 
-        // Dialog buttons
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+        songDialog.showAndWait().ifPresent(response -> handleSongResponse(song, response));
+    }
 
-        Node okBtn = dialog.getDialogPane().lookupButton(ButtonType.OK);
-        songDialogModel.isValidInputProperty().bind(Bindings.createBooleanBinding(this::isDataValid, songDialogModel.getBindableProperties()));
-        okBtn.disableProperty().bind(songDialogModel.isValidInputProperty().not());
-
-        // Handle pressing the dialog buttons
-        dialog.setResultConverter(dialogBtn -> {
-            if (dialogBtn == ButtonType.OK) {
-                if (mode == SongDialogViewBuilder.Mode.CREATE) {
-                    return createNewSongFromModel(songDialogModel);
-                } else {
-                    return updateSongFromModel(songDialogModel);
-                }
+    private void handleSongResponse(Song existingSong, Song responseSong) {
+        try {
+            if (existingSong == null) {
+                songModel.createNewSong(responseSong);
+            } else {
+                songModel.updateSong(responseSong);
             }
-            return null;
-        });
-
-        dialog.showAndWait();
+            tblSongs.refresh();
+        } catch (Exception e) {
+            displayError(e);
+        }
     }
 
     private void displayError(Throwable t) {
@@ -357,80 +352,6 @@ public class MainController {
         alert.showAndWait();
     }
 
-    private void chooseFile(TextField fieldFilePath) {
-        FileChooser chooser = new FileChooser();
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Music Files", "*.mp3", "*.wav");
-        chooser.getExtensionFilters().add(filter);
-
-        File selectedFile = chooser.showOpenDialog(null);
-        if (selectedFile != null) {
-            fieldFilePath.setText(selectedFile.getAbsolutePath());
-            getMetadataFromFile(selectedFile);
-        }
-    }
-
-    private void getMetadataFromFile(File file) {
-        Media media = new Media(file.toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-
-        mediaPlayer.setOnReady(() -> {
-            String artist = (String) media.getMetadata().get("artist");
-            String title = (String) media.getMetadata().get("title");
-            Duration duration = media.getDuration();
-            int millis = (int) duration.toMillis();
-
-            songDialogModel.setArtist(artist != null ? artist : "");
-            songDialogModel.setTitle(title != null ? title : "");
-            songDialogModel.setDuration(millis);
-        });
-        //mediaPlayer.dispose();
-    }
-
-    private boolean isDataValid() {
-        return !songDialogModel.getTitle().trim().isEmpty() &&
-               !songDialogModel.getArtist().trim().isEmpty() &&
-               !songDialogModel.getGenre().trim().isEmpty() &&
-               !songDialogModel.getDuration().trim().isEmpty() &&
-               !songDialogModel.getFilePath().trim().isEmpty();
-    }
-
-    private Song createNewSongFromModel(SongDialogModel model) {
-        try {
-            String title = model.getTitle();
-            String artist = model.getArtist();
-            String genre = model.getGenre();
-            int duration = new TimeStringConverter().fromString(model.getDuration());
-            String filePath = model.getFilePath();
-
-            Song newSong = new Song(-1, title, artist, genre, duration, filePath);
-            songModel.createNewSong(newSong);
-            model.reset();
-            return newSong;
-        } catch (Exception e) {
-            displayError(e);
-            return null;
-        }
-    }
-
-    private Song updateSongFromModel(SongDialogModel model) {
-        try {
-            int id = model.getId();
-            String title = model.getTitle();
-            String artist = model.getArtist();
-            String genre = model.getGenre();
-            int duration = new TimeStringConverter().fromString(model.getDuration());
-            String filePath = model.getFilePath();
-
-            Song song = new Song(id, title, artist, genre, duration, filePath);
-            songModel.updateSong(song);
-            model.reset();
-            tblSongs.refresh();
-            return song;
-        } catch (Exception e) {
-            displayError(e);
-            return null;
-        }
-    }
 
     @FXML
     private void newPlaylist(ActionEvent actionEvent) {
