@@ -54,6 +54,9 @@
           <TableColumn fx:id="colPlistSongs" minWidth="1.0" prefWidth="45.0" text="Songs" />
             <TableColumn fx:id="colPlistTime" prefWidth="71.19999694824219" text="Time" />
         </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
       </TableView>
       <TableView fx:id="tblSongs" layoutX="465.0" layoutY="100.0" prefHeight="435.0" prefWidth="393.0">
          <columns>
@@ -62,13 +65,16 @@
             <TableColumn fx:id="colGenre" text="Genre" />
             <TableColumn fx:id="colDuration" text="Time" />
          </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
       </TableView>
       <Label layoutX="18.0" layoutY="83.0" text="Playlists" />
       <Label layoutX="276.0" layoutY="83.0" text="Songs in Playlist" />
       <Label layoutX="465.0" layoutY="83.0" text="Songs" />
-      <Label fx:id="currentPlayingLbl" layoutX="395.0" layoutY="31.0" text="(None) is playing" />
+      <Label fx:id="currentPlayingLbl" alignment="CENTER" contentDisplay="CENTER" layoutX="395.0" layoutY="31.0" text="(None) is playing" />
       <Label layoutX="591.0" layoutY="18.0" text="Filter:" />
-      <Slider fx:id="volumeSlider" layoutX="52.0" layoutY="56.0" prefHeight="14.0" prefWidth="110.0" />
+      <Slider fx:id="volumeSlider" layoutX="63.0" layoutY="56.0" prefHeight="14.0" prefWidth="110.0" />
       <Button layoutX="20.0" layoutY="535.0" mnemonicParsing="false" onAction="#newPlaylist" text="New..." />
       <Button layoutX="106.0" layoutY="535.0" mnemonicParsing="false" onAction="#editPlaylist" text="Edit..." />
       <Button layoutX="194.0" layoutY="535.0" mnemonicParsing="false" onAction="#deletePlaylist" text="Delete" />
@@ -101,7 +107,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="btnMute" layoutX="17.0" layoutY="54.0" onAction="#muteVolume">
+      <Button fx:id="btnMute" layoutX="9.0" layoutY="50.0" onAction="#muteVolume">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -111,7 +117,7 @@
          </graphic>
       </Button>
       <Slider fx:id="playbackSlider" layoutX="253.0" layoutY="56.0" prefHeight="14.0" prefWidth="354.0" />
-      <Label fx:id="curTimeLbl" layoutX="216.0" layoutY="55.0" text="00:00" />
+      <Label fx:id="curTimeLbl" layoutX="219.0" layoutY="55.0" text="00:00" />
       <Label fx:id="totalDurLbl" layoutX="610.0" layoutY="55.0" text="00:00" />
    </children>
 </AnchorPane>

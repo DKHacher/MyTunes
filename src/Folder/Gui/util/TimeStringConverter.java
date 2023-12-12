@@ -9,10 +9,10 @@ public class TimeStringConverter extends StringConverter<Integer> {
             return "";
         }
 
-        int hours = object / 3600000;
-        int minutes = (object % 3600000) / 60000;
+        // Convert milliseconds to mm:ss
+        int minutes = object / 60000;
         int seconds = (object % 60000) / 1000;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     @Override
@@ -21,10 +21,14 @@ public class TimeStringConverter extends StringConverter<Integer> {
             return 0;
         }
 
+        // Split the string into minutes and seconds
         String[] parts = string.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1]);
-        int seconds = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
-        return (hours * 3600 + minutes * 60 + seconds) * 1000;
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Invalid time format, must be mm:ss");
+        }
+
+        int minutes = Integer.parseInt(parts[0]);
+        int seconds = Integer.parseInt(parts[1]);
+        return (minutes * 60 + seconds) * 1000;
     }
 }
