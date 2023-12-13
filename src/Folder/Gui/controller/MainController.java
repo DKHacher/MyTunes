@@ -2,13 +2,13 @@ package Folder.Gui.controller;
 
 import Folder.Be.Playlist;
 import Folder.Be.Song;
+import Folder.Gui.util.SongQueue;
 import Folder.Common.SongPlaybackException;
 import Folder.Gui.model.*;
 import Folder.Gui.util.DialogBuilder;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
-import Folder.Gui.view.SongDialogViewBuilder;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -23,18 +23,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
-import javafx.util.Duration;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class MainController {
     @FXML private ListView lstSongsInPlaylist;
@@ -66,6 +58,7 @@ public class MainController {
     private final PlaybackModel playbackModel;
     private SongModel songModel;
     private PlaylistModel playlistModel;
+    private SongQueue songQueue;
 
 
     public MainController() {

@@ -1,17 +1,16 @@
 package Folder.Gui.util;
 
 import Folder.Be.Song;
-import Folder.Bll.SongQueue;
 import Folder.Common.SongPlaybackException;
 import Folder.Gui.model.PlaybackModel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles media playback functionality, including playing, pausing,
@@ -34,7 +33,7 @@ public class PlaybackHandler {
     public PlaybackHandler(PlaybackModel model) {
         this.model = model;
         model.setVolume(START_VOLUME);
-        songQueue = new SongQueue(new ArrayList<>());
+        songQueue = new SongQueue(FXCollections.observableArrayList());
     }
 
     /**
@@ -170,12 +169,12 @@ public class PlaybackHandler {
 
     /**
      * Sets the queue of songs to be played or replaces the current song queue with the specified queue.<br>
-     * This method does not modify the provided queue list.
      *
-     * @param queue The list of songs to be set as the queue.
+     * @param queue The ObservableList of songs to be set as the queue.<br>
+     *              Changes to this list will be reflected in the behavior song queue due its reactive nature.
      * @throws IllegalArgumentException If queue is null, contains null elements.
      */
-    public void setQueue(List<Song> queue) {
+    public void setQueue(ObservableList<Song> queue) {
         if (queue == null) throw new IllegalArgumentException("Queue cannot be null");
 
         songQueue = new SongQueue(queue);
