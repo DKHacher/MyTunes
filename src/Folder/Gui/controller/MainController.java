@@ -2,7 +2,6 @@ package Folder.Gui.controller;
 
 import Folder.Be.Playlist;
 import Folder.Be.Song;
-import Folder.Gui.util.SongQueue;
 import Folder.Common.SongPlaybackException;
 import Folder.Gui.model.*;
 import Folder.Gui.util.DialogBuilder;
@@ -58,7 +57,6 @@ public class MainController {
     private final PlaybackModel playbackModel;
     private SongModel songModel;
     private PlaylistModel playlistModel;
-    private SongQueue songQueue;
 
 
     public MainController() {
