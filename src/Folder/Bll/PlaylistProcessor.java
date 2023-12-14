@@ -29,4 +29,9 @@ public class PlaylistProcessor {
     public void deletePlaylist(Playlist playlist) throws Exception {
         listDAO.deletePlaylist(playlist);
     }
+
+
+    public void updatePlaylistSongs(Playlist playlist) throws Exception {
+        listDAO.updatePlaylistSongs(playlist);
+    }
 }

@@ -56,7 +56,7 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
 
         try (Connection conn = dbConnector.getConnection();
              Statement stmt = conn.createStatement()) {
-            String sql = "SELECT * FROM dbo.SongPlaylist WHERE PlaylistID = "+id+";";
+            String sql = "SELECT * FROM dbo.SongPlaylist WHERE PlaylistID = "+id+" order by Position;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -147,4 +147,36 @@ public class PlaylistDAO_DB implements IPlaylistDataAccess {
             e.printStackTrace();
             throw new Exception("Could not delete playlist", e);
         }
-    }}
+    }
+    @Override// Frederik: what the hell even is this
+    public void updatePlaylistSongs(Playlist playlist) throws Exception {
+        // SQL command
+        String sqlDeletePrevious = "DELETE FROM dbo.SongPlaylist WHERE PlaylistID = ?;";
+        String sqlCreateNew = "INSERT INTO dbo.SongPlaylist VALUES ";
+        int position = 1;
+        for (Song song:playlist.getSongList()) {
+            String toAdd ="\n" + "(" + song.getId() + ", " + playlist.getId() + ", " + position + "),";
+            sqlCreateNew += toAdd;
+            position++;
+        }
+        sqlCreateNew = sqlCreateNew.substring(0,sqlCreateNew.length() - 1);
+        sqlCreateNew += ";";
+        try (
+                Connection conn = dbConnector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sqlDeletePrevious);
+                PreparedStatement stmt2 = conn.prepareStatement(sqlCreateNew)
+        ) {
+            // Bind parameters
+            stmt.setInt(1, playlist.getId());
+
+            // Run the specified SQL statement
+            stmt.executeUpdate();
+            stmt2.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new Exception("Could not update songs associated with playlist", e);
+        }
+
+    }
+}
+

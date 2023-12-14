@@ -8,7 +8,6 @@ import Folder.Gui.util.DialogBuilder;
 import Folder.Gui.util.PlaybackHandler;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
-import Folder.Gui.view.SongDialogViewBuilder;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -23,18 +22,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
-import javafx.util.Duration;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class MainController {
     @FXML private ListView lstSongsInPlaylist;
@@ -456,5 +447,75 @@ public class MainController {
 
     public void tblPlaylistMouseClick(MouseEvent mouseEvent) {
         playlistSongsRefresh();
+    }
+
+    public void btnAddSongToPlaylist(ActionEvent actionEvent) {
+        try{
+            if (tblPlaylists.getSelectionModel().getSelectedItem() != null && tblSongs.getSelectionModel().getSelectedItem() != null){
+                Song song = (Song) tblSongs.getSelectionModel().getSelectedItem();
+                Playlist playlist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+                playlist.addToSongList(song);
+                playlistModel.UpdatePlaylistSongs(playlist);
+                playlistSongsRefresh();
+            }
+        }
+        catch (Exception e){
+            displayError(e);
+        }
+
+    }
+
+    public void btnDeleteSongFromPlaylist(ActionEvent actionEvent) {
+        try{
+            if (tblPlaylists.getSelectionModel().getSelectedItem() != null && lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null){
+                Playlist playlist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+                playlist.getSongList().remove(lstSongsInPlaylist.getSelectionModel().getSelectedIndex());
+                playlistModel.UpdatePlaylistSongs(playlist);
+                playlistSongsRefresh();
+            }
+        }
+        catch (Exception e){
+            displayError(e);
+        }
+    }
+
+    public void btnMoveSongUp(ActionEvent actionEvent) {
+        try{
+            if (tblPlaylists.getSelectionModel().getSelectedItem() != null && lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null){
+                Playlist playlist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+                if (lstSongsInPlaylist.getSelectionModel().getSelectedIndex() != 0){
+                    int indexofsongthatreplaces = lstSongsInPlaylist.getSelectionModel().getSelectedIndex();
+                    Song songThatReplaces = playlist.getSongList().get(lstSongsInPlaylist.getSelectionModel().getSelectedIndex());
+                    Song songToReplace = playlist.getSongList().get(lstSongsInPlaylist.getSelectionModel().getSelectedIndex() - 1);
+                    playlist.getSongList().set(indexofsongthatreplaces - 1, songThatReplaces);
+                    playlist.getSongList().set(indexofsongthatreplaces, songToReplace);
+                    playlistModel.UpdatePlaylistSongs(playlist);
+                }
+                playlistSongsRefresh();
+            }
+        }
+        catch (Exception e){
+            displayError(e);
+        }
+    }
+
+    public void btnMoveSongDown(ActionEvent actionEvent) {
+        try{
+            if (tblPlaylists.getSelectionModel().getSelectedItem() != null && lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null){
+                Playlist playlist = (Playlist) tblPlaylists.getSelectionModel().getSelectedItem();
+                if (lstSongsInPlaylist.getSelectionModel().getSelectedIndex() != lstSongsInPlaylist.getItems().size()){
+                    int indexofsongthatreplaces = lstSongsInPlaylist.getSelectionModel().getSelectedIndex();
+                    Song songThatReplaces = playlist.getSongList().get(lstSongsInPlaylist.getSelectionModel().getSelectedIndex());
+                    Song songToReplace = playlist.getSongList().get(lstSongsInPlaylist.getSelectionModel().getSelectedIndex() + 1);
+                    playlist.getSongList().set(indexofsongthatreplaces + 1, songThatReplaces);
+                    playlist.getSongList().set(indexofsongthatreplaces, songToReplace);
+                    playlistModel.UpdatePlaylistSongs(playlist);
+                }
+                playlistSongsRefresh();
+            }
+        }
+        catch (Exception e){
+            displayError(e);
+        }
     }
 }

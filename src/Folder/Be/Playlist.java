@@ -57,6 +57,10 @@ public class Playlist {
     }
     return StringSongList;
     }
+
+    public void addToSongList(Song song){
+        songList.add(song);
+    }
     
 
 }

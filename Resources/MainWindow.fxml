@@ -78,7 +78,7 @@
       <Button layoutX="20.0" layoutY="535.0" mnemonicParsing="false" onAction="#newPlaylist" text="New..." />
       <Button layoutX="106.0" layoutY="535.0" mnemonicParsing="false" onAction="#editPlaylist" text="Edit..." />
       <Button layoutX="194.0" layoutY="535.0" mnemonicParsing="false" onAction="#deletePlaylist" text="Delete" />
-      <Button layoutX="274.0" layoutY="535.0" mnemonicParsing="false">
+      <Button layoutX="274.0" layoutY="535.0" mnemonicParsing="false" onAction="#btnMoveSongUp">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -86,7 +86,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="316.0" layoutY="535.0" mnemonicParsing="false">
+      <Button layoutX="316.0" layoutY="535.0" mnemonicParsing="false" onAction="#btnMoveSongDown">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -94,12 +94,12 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="362.0" layoutY="535.0" mnemonicParsing="false" prefWidth="50.0" text="Delete" />
+      <Button layoutX="362.0" layoutY="535.0" mnemonicParsing="false" onAction="#btnDeleteSongFromPlaylist" prefWidth="50.0" text="Delete" />
       <Button fx:id="btnNew" layoutX="465.0" layoutY="535.0" mnemonicParsing="false" onAction="#newSong" text="New..." />
       <Button fx:id="btnEdit" layoutX="539.0" layoutY="535.0" mnemonicParsing="false" onAction="#editSong" text="Edit..." />
       <Button fx:id="btnDelete" layoutX="610.0" layoutY="535.0" mnemonicParsing="false" onAction="#deleteSong" text="Delete" />
       <Button layoutX="807.0" layoutY="535.0" mnemonicParsing="false" text="Close" />
-      <Button layoutX="414.0" layoutY="101.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="52.0">
+      <Button layoutX="414.0" layoutY="101.0" mnemonicParsing="false" onAction="#btnAddSongToPlaylist" prefHeight="26.0" prefWidth="52.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                <image>

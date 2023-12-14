@@ -43,4 +43,10 @@ public class PlaylistModel {
         PlaylistProcessor.deletePlaylist(playlist);
         PlaylistsToBeViewed.remove(playlist);
     }
+
+    public void UpdatePlaylistSongs(Playlist playlist) throws Exception {
+        PlaylistProcessor.updatePlaylistSongs(playlist);
+    }
+
+
 }
