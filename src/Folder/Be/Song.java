@@ -64,10 +64,6 @@ public class Song {
         this.filePath = filePath;
     }
 
-    public File getFile() {
-        return new File(filePath);
-    }
-
     @Override
     public String toString() {
         return "Song{" +
