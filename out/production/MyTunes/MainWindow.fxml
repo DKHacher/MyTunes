@@ -13,15 +13,7 @@
 
 <AnchorPane prefHeight="591.0" prefWidth="873.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Folder.Gui.controller.MainController">
    <children>
-      <TextField fx:id="searchField" layoutX="649.0" layoutY="14.0" onKeyPressed="#handleSearch" />
-      <Button layoutX="807.0" layoutY="14.0" mnemonicParsing="false">
-         <graphic>
-            <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@Images/FilterButtonIcon.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
+      <TextField fx:id="searchField" layoutX="709.0" layoutY="13.0" onKeyPressed="#handleSearch" />
       <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#prevSong" style="-fx-background-radius: 100;">
          <graphic>
             <ImageView fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -73,7 +65,7 @@
       <Label layoutX="276.0" layoutY="83.0" text="Songs in Playlist" />
       <Label layoutX="465.0" layoutY="83.0" text="Songs" />
       <Label fx:id="currentPlayingLbl" alignment="CENTER" contentDisplay="CENTER" layoutX="395.0" layoutY="31.0" text="(None) is playing" />
-      <Label layoutX="591.0" layoutY="18.0" text="Filter:" />
+      <Label layoutX="651.0" layoutY="17.0" text="Filter:" />
       <Slider fx:id="volumeSlider" layoutX="63.0" layoutY="56.0" prefHeight="14.0" prefWidth="110.0" />
       <Button layoutX="20.0" layoutY="535.0" mnemonicParsing="false" onAction="#newPlaylist" text="New..." />
       <Button layoutX="106.0" layoutY="535.0" mnemonicParsing="false" onAction="#editPlaylist" text="Edit..." />
