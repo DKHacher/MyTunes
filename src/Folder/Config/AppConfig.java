@@ -23,7 +23,7 @@ public enum AppConfig {
         }
     }
 
-    public String getProperty(String key) {
-        return properties.getProperty(key);
+    public String getProperty(ConfigProperty property) {
+        return properties.getProperty(property.getKey());
     }
 }

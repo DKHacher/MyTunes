@@ -1,7 +1,10 @@
 package Folder.Gui.controller;
 
 import Folder.Be.Song;
+import Folder.Config.AppConfig;
+import Folder.Config.ConfigProperty;
 import Folder.Gui.model.SongDialogModel;
+import Folder.Gui.util.SongCreationData;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.SongDialogViewBuilder;
 import javafx.beans.binding.Bindings;
@@ -17,15 +20,18 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Manages the dialog for creating or editing a song.
  * It controls the interaction between the user interface and an underlying data model.
  */
-public class SongDialogController implements IDialogController<Song> {
+public class SongDialogController implements IDialogController<SongCreationData> {
     private final SongDialogModel model;
     private final SongDialogViewBuilder dialogViewBuilder;
-    private Dialog<Song> dialog;
+    private Dialog<SongCreationData> dialog;
 
     /**
      * Initializes a new SongDialogController with a specific song and a list of genres.
@@ -47,7 +53,7 @@ public class SongDialogController implements IDialogController<Song> {
     }
 
     @Override
-    public void initializeDialog(Dialog<Song> dialog) {
+    public void initializeDialog(Dialog<SongCreationData> dialog) {
         this.dialog = dialog;
         setupDialog();
     }
@@ -65,11 +71,14 @@ public class SongDialogController implements IDialogController<Song> {
                 int duration = new TimeStringConverter().fromString(model.getDuration());
                 String filePath = model.getFilePath();
 
+                Song song;
                 if (model.getId() == -1) {
-                    return new Song(-1, title, artist, genre, duration, filePath);
+                    song = new Song(-1, title, artist, genre, duration, filePath);
                 } else {
-                    return new Song(model.getId(), title, artist, genre, duration, filePath);
+                    song = new Song(model.getId(), title, artist, genre, duration, filePath);
                 }
+
+                return new SongCreationData(song, model.getFileAbsolutePath());
             }
             return null;
         });
@@ -84,6 +93,27 @@ public class SongDialogController implements IDialogController<Song> {
         if (selectedFile != null) {
             fieldFilePath.setText(selectedFile.getAbsolutePath());
             getMetadataFromFile(selectedFile);
+            model.setFilePath(selectedFile.getName());
+            model.setFileAbsolutePath(selectedFile.getAbsolutePath());
+            System.out.println(model.getFileAbsolutePath());
+        }
+    }
+
+    private File copyFileToDir(File sourceFile) {
+        try {
+            String destPath = AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + sourceFile.getName();
+            File destFile = new File(destPath);
+
+            File dir = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY));
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return destFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

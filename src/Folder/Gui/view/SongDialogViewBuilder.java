@@ -44,7 +44,7 @@ public class SongDialogViewBuilder implements Builder<Region> {
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        TextField fileChooserField = Widgets.boundTextField(model.filePathProperty());
+        TextField fileChooserField = Widgets.boundTextField(model.filePathProperty(), false);
 
         int row = 0;
         gridPane.addRow(row++, Widgets.promptLabel("Title:"), Widgets.boundTextField(model.titleProperty()));

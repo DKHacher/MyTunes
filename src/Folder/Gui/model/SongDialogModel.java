@@ -14,6 +14,7 @@ public class SongDialogModel {
     private final StringProperty duration = new SimpleStringProperty("");
     private final StringProperty filePath = new SimpleStringProperty("");
     private final BooleanProperty isValidInput = new SimpleBooleanProperty(false);
+    private final StringProperty fileAbsolutePath = new SimpleStringProperty("");
 
     public SongDialogModel() {
         reset();
@@ -132,5 +133,17 @@ public class SongDialogModel {
 
     public void setIsValidInput(boolean isValidInput) {
         this.isValidInput.set(isValidInput);
+    }
+
+    public String getFileAbsolutePath() {
+        return fileAbsolutePath.get();
+    }
+
+    public StringProperty fileAbsolutePathProperty() {
+        return fileAbsolutePath;
+    }
+
+    public void setFileAbsolutePath(String fileAbsolutePath) {
+        this.fileAbsolutePath.set(fileAbsolutePath);
     }
 }

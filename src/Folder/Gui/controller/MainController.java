@@ -3,9 +3,12 @@ package Folder.Gui.controller;
 import Folder.Be.Playlist;
 import Folder.Be.Song;
 import Folder.Common.SongPlaybackException;
+import Folder.Config.AppConfig;
+import Folder.Config.ConfigProperty;
 import Folder.Gui.model.*;
 import Folder.Gui.util.DialogBuilder;
 import Folder.Gui.util.PlaybackHandler;
+import Folder.Gui.util.SongCreationData;
 import Folder.Gui.util.TimeStringConverter;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
 import javafx.application.Platform;
@@ -23,6 +26,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -315,7 +322,7 @@ public class MainController {
     private void songDialog(Song song) {
         String dialogTitle = (song == null) ? "Create Song" : "Edit Song";
 
-        Dialog<Song> songDialog = new DialogBuilder<Song>(new SongDialogController(song, songModel.getObservableGenres()))
+        Dialog<SongCreationData> songDialog = new DialogBuilder<>(new SongDialogController(song, songModel.getObservableGenres()))
                 .withTitle(dialogTitle)
                 .addButtonTypes(ButtonType.OK, ButtonType.CANCEL)
                 .build();
@@ -323,16 +330,34 @@ public class MainController {
         songDialog.showAndWait().ifPresent(response -> handleSongResponse(song, response));
     }
 
-    private void handleSongResponse(Song existingSong, Song responseSong) {
+    private void handleSongResponse(Song existingSong, SongCreationData response) {
         try {
+            Song responseSong = response.song();
             if (existingSong == null) {
                 songModel.createNewSong(responseSong);
+
+                File sourceFile = new File(response.absolutePath());
+                File destFile = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + responseSong.getFilePath());
+                copyFileToDir(sourceFile, destFile);
             } else {
                 songModel.updateSong(responseSong);
             }
             tblSongs.refresh();
         } catch (Exception e) {
             displayError(e);
+        }
+    }
+
+    private void copyFileToDir(File sourceFile, File destFile) {
+        try {
+            File dir = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY));
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            displayError(new Throwable("Error adding song to " + AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + " directory.\n" + e.getMessage()));
         }
     }
 

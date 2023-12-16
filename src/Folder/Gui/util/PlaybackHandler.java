@@ -2,6 +2,8 @@ package Folder.Gui.util;
 
 import Folder.Be.Song;
 import Folder.Common.SongPlaybackException;
+import Folder.Config.AppConfig;
+import Folder.Config.ConfigProperty;
 import Folder.Gui.model.PlaybackModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,11 +55,10 @@ public class PlaybackHandler {
     public void play(Song song) throws SongPlaybackException {
         if (song == null) throw new IllegalArgumentException("Song cannot be null");
 
-        //String filePath = AppConfig.INSTANCE.getProperty("fileDirectory") + song.getFilePath();
-        String filePath = song.getFilePath(); // For testing, need to change Song table in DB to use fileName only and not full filePath
+        String filePath = AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + song.getFilePath();
 
         File file = new File(filePath);
-        if (!isValidSong(song)) {
+        if (!isValidFile(file)) {
             throw new SongPlaybackException(
                     "Error playing the song: " + song.getFilePath() + "\n" +
                     "Invalid file path or format"
@@ -205,8 +206,7 @@ public class PlaybackHandler {
         songQueue.previous().ifPresent(this::playSongHandlingException);
     }
 
-    private boolean isValidSong(Song song) {
-        File file = new File(song.getFilePath());
+    private boolean isValidFile(File file) {
         return file.exists() && isPlayableFormat(file);
     }
 
