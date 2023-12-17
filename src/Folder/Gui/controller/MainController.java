@@ -240,6 +240,9 @@ public class MainController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 try {
                     songModel.deleteSong(selectedSong);
+
+                    String absolutePath = AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + selectedSong.getFilePath();
+                    fileManagementService.deleteFile(absolutePath);
                 } catch (Exception e) {
                     displayError(e);
                 }

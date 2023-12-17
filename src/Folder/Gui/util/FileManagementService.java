@@ -15,4 +15,11 @@ public class FileManagementService {
 
         Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
+
+    public void deleteFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        if (file.exists() && !file.delete()) {
+            throw new IOException("Failed to delete file: " + filePath);
+        }
+    }
 }
