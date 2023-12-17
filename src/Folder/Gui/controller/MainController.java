@@ -6,10 +6,7 @@ import Folder.Common.SongPlaybackException;
 import Folder.Config.AppConfig;
 import Folder.Config.ConfigProperty;
 import Folder.Gui.model.*;
-import Folder.Gui.util.DialogBuilder;
-import Folder.Gui.util.PlaybackHandler;
-import Folder.Gui.util.SongCreationData;
-import Folder.Gui.util.TimeStringConverter;
+import Folder.Gui.util.*;
 import Folder.Gui.view.PlaylistDialogViewBuilder;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -62,6 +59,7 @@ public class MainController {
     private final PlaylistDialogModel playlistDialogModel;
     private final PlaybackHandler playbackHandler;
     private final PlaybackModel playbackModel;
+    private final FileManagementService fileManagementService;
     private SongModel songModel;
     private PlaylistModel playlistModel;
 
@@ -71,6 +69,7 @@ public class MainController {
         playlistDialogModel = new PlaylistDialogModel();
         playbackModel = new PlaybackModel();
         playbackHandler = new PlaybackHandler(playbackModel);
+        fileManagementService = new FileManagementService();
 
         try {
             songModel = new SongModel();
@@ -335,10 +334,7 @@ public class MainController {
             Song responseSong = response.song();
             if (existingSong == null) {
                 songModel.createNewSong(responseSong);
-
-                File sourceFile = new File(response.absolutePath());
-                File destFile = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + responseSong.getFilePath());
-                copyFileToDir(sourceFile, destFile);
+                fileManagementService.copyFileToDir(new File(response.absolutePath()), AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY));
             } else {
                 songModel.updateSong(responseSong);
             }
@@ -348,26 +344,12 @@ public class MainController {
         }
     }
 
-    private void copyFileToDir(File sourceFile, File destFile) {
-        try {
-            File dir = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY));
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-
-            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            displayError(new Throwable("Error adding song to " + AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + " directory.\n" + e.getMessage()));
-        }
-    }
-
     private void displayError(Throwable t) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Something went wrong");
         alert.setHeaderText(t.getMessage());
         alert.showAndWait();
     }
-
 
     @FXML
     private void newPlaylist(ActionEvent actionEvent) {

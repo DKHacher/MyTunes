@@ -95,25 +95,6 @@ public class SongDialogController implements IDialogController<SongCreationData>
             getMetadataFromFile(selectedFile);
             model.setFilePath(selectedFile.getName());
             model.setFileAbsolutePath(selectedFile.getAbsolutePath());
-            System.out.println(model.getFileAbsolutePath());
-        }
-    }
-
-    private File copyFileToDir(File sourceFile) {
-        try {
-            String destPath = AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY) + "/" + sourceFile.getName();
-            File destFile = new File(destPath);
-
-            File dir = new File(AppConfig.INSTANCE.getProperty(ConfigProperty.FILE_DIRECTORY));
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-
-            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            return destFile;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
