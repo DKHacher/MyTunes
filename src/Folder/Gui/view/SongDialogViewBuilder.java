@@ -51,7 +51,12 @@ public class SongDialogViewBuilder implements Builder<Region> {
         gridPane.addRow(row++, Widgets.promptLabel("Artist:"), Widgets.boundTextField(model.artistProperty()));
         gridPane.addRow(row++, Widgets.promptLabel("Genre:"), Widgets.boundAutocompleteTextField(genres, model.genreProperty()));
         gridPane.addRow(row++, Widgets.promptLabel("Duration:"), Widgets.boundFormattedTextField(model.durationProperty(), new TimeFilter(), new TimeStringConverter()));
-        gridPane.addRow(row++, Widgets.promptLabel("File:"), fileChooserField, Widgets.chooseActionButton("Choose...", fileChooserField, fileChooserConsumer));
+
+        if (model.getFilePath().isEmpty()) {
+            gridPane.addRow(row++, Widgets.promptLabel("File:"), fileChooserField, Widgets.chooseActionButton("Choose...", fileChooserField, fileChooserConsumer));
+        } else {
+            gridPane.addRow(row++, Widgets.promptLabel("File:"), fileChooserField);
+        }
 
         return gridPane;
     }
